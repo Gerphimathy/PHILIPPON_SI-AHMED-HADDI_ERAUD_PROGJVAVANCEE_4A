@@ -3,18 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Pong;
 
 namespace MCTS
 {
-    public struct Action
-    {
-        Paddle.MovementAxis _direction;
-
-        public Action(Paddle.MovementAxis direction)
-        {
-            _direction = direction;
-        }
-    }
     public class MCTS
     {
         private const float _explorationFactor = .8f;
@@ -44,7 +36,7 @@ namespace MCTS
             Assert.IsNotNull(best);
             return best.ParentAction;
             Assert.IsTrue(false);
-            return new Action(Paddle.MovementAxis.X);
+            return Action.None;
         }
         public MCTSNode Select()
         {

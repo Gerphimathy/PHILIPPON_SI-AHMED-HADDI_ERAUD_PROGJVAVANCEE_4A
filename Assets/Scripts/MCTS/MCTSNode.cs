@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Pong;
 
 namespace MCTS
 {
@@ -37,7 +38,7 @@ namespace MCTS
 
             }
             Debug.LogError("Placeholder");
-            return new List<Action>(){ new Action(Paddle.MovementAxis.X), new Action(Paddle.MovementAxis.Z) };
+            return new List<Action>() { Action.Up, Action.Down, Action.None };
         }
 
         public MCTSNode Expand()
