@@ -34,7 +34,8 @@ public struct Ball
     public void Move(ref Bounds terrainBounds, float delta)
     {
      
-        //TODO: Implement Ball Movement and Bounce 
-        throw new NotImplementedException();
+        Moveable.Move(Direction.normalized * delta);
+        if (!terrainBounds.Contains(Moveable.Bounds.center)) _direction.x *= -1f;
+
     }
 }

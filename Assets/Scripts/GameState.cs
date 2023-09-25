@@ -12,9 +12,17 @@ public class GameState
     private Ball _ball;
     private Bounds _terrainBounds;
 
-    private bool _hasGameEnded;
+    public enum GameStatusEnum
+    {
+        Player1Win = -1,
+        Ongoing = 0,
+        Player2Win
+    }
 
-    public bool HasGameEnded => _hasGameEnded;
+    private GameStatusEnum _gameStatus;
+
+    public GameStatusEnum GameStatus => _gameStatus;
+
 
     public GameState(Paddle paddle1, Paddle paddle2, Ball ball, Bounds terrainBounds)
     {
@@ -22,6 +30,7 @@ public class GameState
         _paddle2 = paddle2;
         _ball = ball;
         _terrainBounds = terrainBounds;
+        _gameStatus = GameStatusEnum.Ongoing;
     }
 
 
@@ -32,8 +41,17 @@ public class GameState
         
         _ball.Move(ref _terrainBounds, delta);
 
-        if (_terrainBounds.Intersects(_ball.Moveable.Bounds)) _hasGameEnded = true;
+        if (!_terrainBounds.Intersects(_ball.Moveable.Bounds))
+        {
+            var ballCenter = _ball.Moveable.Bounds.center;
+            var closestPoint = _terrainBounds.ClosestPoint(ballCenter);
+
+            var difference = ballCenter.z - closestPoint.z;
+
+            if (difference > 0.01) _gameStatus = GameStatusEnum.Player2Win;
+            else if (difference < 0.01) _gameStatus = GameStatusEnum.Player1Win;
+
+        }
     }
     
-    //TODO: 
 }
