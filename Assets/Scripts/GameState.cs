@@ -24,6 +24,14 @@ public class GameState
         _terrainBounds = terrainBounds;
     }
 
+    public Paddle Paddle1 => _paddle1;
+
+    public Paddle Paddle2 => _paddle2;
+
+    public Ball Ball => _ball;
+
+    public Bounds TerrainBounds => _terrainBounds;
+
 
     public void Tick(Action actionAgent1, Action actionAgent2, float delta)
     {

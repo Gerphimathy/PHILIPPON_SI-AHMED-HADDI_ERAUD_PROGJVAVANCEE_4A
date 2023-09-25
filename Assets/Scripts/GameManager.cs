@@ -14,9 +14,16 @@ public class GameManager : MonoBehaviour
     public GameObject paddleGo2;
     public GameObject ballGo;
     
+    [SerializeField] 
+    public Bounds terrainBounds;
+    
     void Start()
     {
-        _gameState = new GameState();
+        var paddle1 = new Paddle();
+        var paddle2 = new Paddle();
+        var ball = new Ball();
+        
+        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
     }
 
     void Update()
@@ -27,7 +34,9 @@ public class GameManager : MonoBehaviour
     
     void SyncMovables()
     {
-        
+        paddleGo1.transform.position = _gameState.Paddle1.Moveable.Bounds.center;
+        paddleGo2.transform.position = _gameState.Paddle2.Moveable.Bounds.center;
+        ballGo.transform.position = _gameState.Ball.Moveable.Bounds.center;
     }
 
     Action GetAction(Agent agent)
@@ -37,24 +46,21 @@ public class GameManager : MonoBehaviour
             case Agent.Player1Agent:
                 if (Input.GetKey(KeyCode.Z))
                     return Action.Up;
-                else if (Input.GetKey(KeyCode.S))
+                if (Input.GetKey(KeyCode.S))
                     return Action.Down;
-                else 
-                    return Action.None;
-                break;
+                return Action.None;
             
             case Agent.Player2Agent:
                 if (Input.GetKey(KeyCode.UpArrow))
                     return Action.Up;
-                else if (Input.GetKey(KeyCode.DownArrow))
+                if (Input.GetKey(KeyCode.DownArrow))
                     return Action.Down;
-                else 
-                    return Action.None;
-                break;
+                 
+                return Action.None;
             
             case Agent.RandomAgent:
                 return (Action)Random.Range(-1, 2);
-            break;
+            
             default:
                 return Action.None;
         }
