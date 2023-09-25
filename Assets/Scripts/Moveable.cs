@@ -22,7 +22,9 @@ public class Moveable
 
     public void Move(Vector3 displacement)
     {
-        _bounds.center += displacement;
+        _bounds.center += displacement * _speed;
     }
+
+
 
 }
