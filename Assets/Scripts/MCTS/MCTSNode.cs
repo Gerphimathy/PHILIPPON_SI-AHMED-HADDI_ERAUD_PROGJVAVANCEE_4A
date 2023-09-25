@@ -27,7 +27,7 @@ namespace MCTS
             this._parentAction = parentAction;
             node._childrens.Add(this);
         }
-        public List<Action> GetPossibleActions(int playerIndex)
+        public static List<Action> GetPossibleActions(int playerIndex)
         {
             if(playerIndex == 0)
             {
@@ -45,7 +45,7 @@ namespace MCTS
         {
             var actions = GetPossibleActions(0);
             Assert.IsTrue(actions != null && actions.Count != 0);
-            var son = new MCTSNode(this, MCTS.RandomValue(actions));
+            var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
             if (actions.Count == 1)
                 _expanded = true;
             return son;
@@ -53,13 +53,13 @@ namespace MCTS
 
         internal void Simulate()
         {
-            for (int sim = 0; sim < MCTS.nbSimulation; sim++)
+            for (int sim = 0; sim < MCTSPlayer.nbSimulation; sim++)
             {
                 while (!_gameState.HasGameEnded)
                 {
-                    var a1 = MCTS.RandomValue(GetPossibleActions(0));
-                    var a2 = MCTS.RandomValue(GetPossibleActions(1));
-                    _gameState.Tick(a1, a2, MCTS.deltaTime);
+                    var a1 = MCTSPlayer.RandomValue(GetPossibleActions(0));
+                    var a2 = MCTSPlayer.RandomValue(GetPossibleActions(1));
+                    _gameState.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
             }
         }

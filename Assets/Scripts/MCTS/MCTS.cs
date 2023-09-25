@@ -7,7 +7,7 @@ using Pong;
 
 namespace MCTS
 {
-    public class MCTS : IPlayer
+    public class MCTSPlayer : IPlayer
     {
         private const float _explorationFactor = .8f;
         private const int _nbSearch = 20;
@@ -18,7 +18,7 @@ namespace MCTS
         private MCTSNode _root;
         private List<MCTSNode> _allNodes;
 
-        public MCTS(GameState gameState)
+        public MCTSPlayer(GameState gameState)
         {
             _root = new(gameState);
         }
