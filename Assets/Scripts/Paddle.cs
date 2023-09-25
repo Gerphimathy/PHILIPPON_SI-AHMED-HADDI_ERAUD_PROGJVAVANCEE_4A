@@ -1,5 +1,4 @@
 using System;
-
 public struct Paddle
 {
    
@@ -7,7 +6,7 @@ public struct Paddle
 
    public Moveable Moveable => _moveable;
 
-   public void Move(Action agentInput, float delta)
+   public void Move(Pong.Action agentInput, float delta)
    {
       //TODO: Implement Paddle Movement
       throw new NotImplementedException();

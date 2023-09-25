@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        _gameState.Tick(GetAction(player1Agent), GetAction(player2Agent));
+        _gameState.Tick(GetAction(player1Agent), GetAction(player2Agent), Time.deltaTime);
         SyncMovables();   
     }
     
