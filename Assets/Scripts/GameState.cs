@@ -1,8 +1,37 @@
-using Pong;
+using UnityEngine;
+using UnityEngine.Assertions;
 
-public class GameState{
-    public void Tick(Action action1, Action action2)
+public class GameState
+
+{
+
+    private Paddle _paddle1;
+    private Paddle _paddle2;
+    private Ball _ball;
+    private Bounds _terrainBounds;
+
+    private bool _hasGameEnded;
+
+    public bool HasGameEnded => _hasGameEnded;
+
+    public GameState(Paddle paddle1, Paddle paddle2, Ball ball, Bounds terrainBounds)
     {
-        
+        _paddle1 = paddle1;
+        _paddle2 = paddle2;
+        _ball = ball;
+        _terrainBounds = terrainBounds;
     }
+
+
+    public void Tick(Action actionAgent1, Action actionAgent2, float delta)
+    {
+        _paddle1.Move(actionAgent1, delta);
+        _paddle2.Move(actionAgent2, delta);
+        
+        _ball.Move(ref _terrainBounds, delta);
+
+        if (_terrainBounds.Intersects(_ball.Moveable.Bounds)) _hasGameEnded = true;
+    }
+    
+    //TODO: 
 }
