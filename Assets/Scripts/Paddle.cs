@@ -1,4 +1,9 @@
 using System;
+using Pong;
+using UnityEngine;
+using UnityEngine.Assertions;
+using Action = Pong.Action;
+
 public struct Paddle
 {
    
@@ -6,9 +11,24 @@ public struct Paddle
 
    public Moveable Moveable => _moveable;
 
-   public void Move(Pong.Action agentInput, float delta)
+   public void Move(Action agentInput, float delta)
    {
-      //TODO: Implement Paddle Movement
-      throw new NotImplementedException();
+      switch (agentInput)
+      {
+         case Action.Up:
+            Moveable.Move(Vector3.right * delta);
+            break;
+         
+         case Action.Down:
+            Moveable.Move(Vector3.left * delta);
+            break;
+         
+         case Action.None:
+            break;
+         
+         default:
+            Assert.IsFalse(true);
+            break;
+      }
    }
 }
