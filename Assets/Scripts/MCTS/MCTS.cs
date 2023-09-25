@@ -7,7 +7,7 @@ using Pong;
 
 namespace MCTS
 {
-    public class MCTS
+    public class MCTS : IPlayer
     {
         private const float _explorationFactor = .8f;
         private const int _nbSearch = 20;
@@ -78,6 +78,11 @@ namespace MCTS
                 visited.Add(node);
                 ExploreTree(node, visited);
             }
+        }
+
+        public Action GetAction()
+        {
+            return BestMove();
         }
     }
 }
