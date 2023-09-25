@@ -55,7 +55,7 @@ namespace MCTS
         {
             for (int sim = 0; sim < MCTSPlayer.nbSimulation; sim++)
             {
-                while (!_gameState.HasGameEnded)
+                while (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
                 {
                     var a1 = MCTSPlayer.RandomValue(GetPossibleActions(0));
                     var a2 = MCTSPlayer.RandomValue(GetPossibleActions(1));
