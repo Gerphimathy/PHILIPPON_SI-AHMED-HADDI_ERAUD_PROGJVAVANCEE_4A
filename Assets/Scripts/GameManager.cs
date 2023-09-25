@@ -61,6 +61,10 @@ public class GameManager : MonoBehaviour
             case Agent.RandomAgent:
                 return (Action)Random.Range(-1, 2);
             
+            case Agent.MctsAgent:
+                //TODO
+                return Action.None;
+            
             default:
                 return Action.None;
         }
