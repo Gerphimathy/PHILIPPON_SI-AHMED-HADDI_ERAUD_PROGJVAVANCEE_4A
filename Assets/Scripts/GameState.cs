@@ -48,14 +48,31 @@ public class GameState
         _paddle2.Move(ref _terrainBounds, actionAgent2, delta);
         
         _ball.Move(ref _terrainBounds, delta);
-        if (!_terrainBounds.Contains(_ball.Moveable.Bounds.center)) _ball.Direction.x *= -1f;
+        if (!_terrainBounds.Contains(_ball.Moveable.Bounds.center + Vector3.Scale(_ball.Direction.normalized,_ball.Moveable.Bounds.size)))
+            _ball.Direction.x *= -1f;
 
-        if (_ball.Moveable.Bounds.Intersects(_paddle1.Moveable.Bounds) ||
-            _ball.Moveable.Bounds.Intersects(_paddle2.Moveable.Bounds))
+        
+        var paddle1Bounds = _paddle1.Moveable.Bounds;
+        var paddle2Bounds = _paddle2.Moveable.Bounds;
+        var ballBounds = _ball.Moveable.Bounds;
+        
+        if (ballBounds.Intersects(paddle1Bounds))
         {
-            _ball.Direction.z *= -1f;
+            if (Math.Abs(ballBounds.center.x - paddle1Bounds.center.x) > paddle1Bounds.extents.x + ballBounds.extents.x)
+                _ball.Direction.x *= -1f;
+            else
+                _ball.Direction.z *= -1f;
         }
 
+        if (ballBounds.Intersects(paddle2Bounds))
+        {
+            
+            if (Math.Abs(ballBounds.center.x - paddle2Bounds.center.x) > paddle2Bounds.extents.x + ballBounds.extents.x)
+                _ball.Direction.x *= -1f;
+            else
+                _ball.Direction.z *= -1f;
+        }
+        
         _ball.Move(ref _terrainBounds, delta);
         
         

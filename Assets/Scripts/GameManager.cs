@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pong;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -49,13 +51,28 @@ public class GameManager : MonoBehaviour
         Player2 = new RandomPlayer();
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(_gameState.Ball.Moveable.Bounds.center,_gameState.Ball.Moveable.Bounds.size);
+        Gizmos.DrawCube(_gameState.Paddle1.Moveable.Bounds.center,_gameState.Paddle1.Moveable.Bounds.size);
+        Gizmos.DrawCube(_gameState.Paddle2.Moveable.Bounds.center,_gameState.Paddle2.Moveable.Bounds.size);
+        Gizmos.DrawCube(_gameState.TerrainBounds.center,_gameState.TerrainBounds.size);
+
+    }
+
     void Update()
     {
         //To-do find a way to update bot players game states
 
         //
         _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
-        SyncMovables();   
+        SyncMovables();
+
+        if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
+        {
+            Destroy(ballGo.gameObject);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
     
     void SyncMovables()
