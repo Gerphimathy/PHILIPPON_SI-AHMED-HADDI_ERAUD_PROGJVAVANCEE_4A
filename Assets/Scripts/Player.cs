@@ -15,7 +15,7 @@ public class Player : IPlayer
     private KeyCode _up;
     private KeyCode _down;
     
-    Player(Scheme scheme)
+    public Player(Scheme scheme)
     {
         switch (scheme)
         {

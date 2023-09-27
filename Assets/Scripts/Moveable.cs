@@ -8,6 +8,10 @@ public class Moveable
     private float _speed;
     private Bounds _bounds;
 
+    public Moveable() : this(1f,Vector3.zero,Vector3.one)
+    {
+    }
+
     public Moveable(float speed, Vector3 boundsPosition, Vector3 boundsSize)
     {
         _speed = speed;

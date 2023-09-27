@@ -123,6 +123,16 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &104315988 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5283849824017057047, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
+  m_PrefabInstance: {fileID: 1145668923}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &259642702 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5283849824017057047, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
+  m_PrefabInstance: {fileID: 1864653430}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &682818956
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,12 +677,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4f1d65053c3ee3449a1b0eb7b10f8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paddleGo1: {fileID: 0}
-  paddleGo2: {fileID: 0}
-  ballGo: {fileID: 0}
+  paddleGo1: {fileID: 259642702}
+  paddleGo2: {fileID: 104315988}
+  ballGo: {fileID: 682818956}
   terrainBounds:
     m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 4, y: 0, z: 8}
 --- !u!4 &1999384945
 Transform:
   m_ObjectHideFlags: 0

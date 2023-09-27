@@ -7,6 +7,11 @@ public class RandomPlayer : IPlayer
 {
     public Action GetAction()
     {
-        throw new System.NotImplementedException("Waiting for possible moves");
+        switch (Time.time % 3)
+        {
+            case 0: return Action.Up;
+            case 1: return Action.Down;
+            case 2: default: return Action.None;
+        }
     }
 }

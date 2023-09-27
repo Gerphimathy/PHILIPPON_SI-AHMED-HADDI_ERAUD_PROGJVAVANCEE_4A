@@ -19,15 +19,23 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
-        var paddle1 = new Paddle();
-        var paddle2 = new Paddle();
-        var ball = new Ball();
-        
+        var paddle1 = new Paddle( new Moveable(1f, paddleGo1.transform.position,paddleGo1.transform.lossyScale));
+        var paddle2 = new Paddle( new Moveable(1f, paddleGo2.transform.position,paddleGo2.transform.lossyScale));
+        var ball = new Ball(new Moveable(),new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
+        SetPlayers();
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
+    }
+    private void SetPlayers()
+    {
+        Player1 = new Player(Player.Scheme.Arrow);
+        Player2 = new RandomPlayer();
     }
 
     void Update()
     {
+        //To-do find a way to update bot players game states
+
+        //
         _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
         SyncMovables();   
     }

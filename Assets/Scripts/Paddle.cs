@@ -9,7 +9,12 @@ public struct Paddle
    
    private Moveable _moveable;
 
-   public Moveable Moveable => _moveable;
+    public Paddle(Moveable moveable)
+    {
+        _moveable = moveable;
+    }
+
+    public Moveable Moveable => _moveable;
 
    public void Move(Action agentInput, float delta)
    {
