@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
     private void SetPlayers()
     {
         Player1 = new Player(Player.Scheme.Arrow);
-        Player2 = new RandomPlayer();
+        Player2 = new PseudoRandomPlayer();
     }
 
     void Update()
