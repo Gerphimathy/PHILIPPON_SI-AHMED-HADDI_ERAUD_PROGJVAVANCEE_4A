@@ -19,16 +19,33 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
-        var paddle1 = new Paddle( new Moveable(1f, paddleGo1.transform.position,paddleGo1.transform.lossyScale));
-        var paddle2 = new Paddle( new Moveable(1f, paddleGo2.transform.position,paddleGo2.transform.lossyScale));
+        var paddle1 = new Paddle( new Moveable(1f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
+        var paddle2 = new Paddle( new Moveable(1f, paddleGo2.transform.position,paddleGo1.transform.GetChild(0).localScale));
         var ball = new Ball(new Moveable(),new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
         SetPlayers();
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
+        
+        //Create cube object walls that match _terrainBounds
+        GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.min.z);
+        wall.transform.localScale = new Vector3(terrainBounds.size.x,2,0.1f);
+        
+        GameObject wall2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall2.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.max.z);
+        wall2.transform.localScale = new Vector3(terrainBounds.size.x,2,0.1f);
+        
+        GameObject wall3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall3.transform.position = new Vector3(terrainBounds.min.x,terrainBounds.center.y,terrainBounds.center.z);
+        wall3.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
+        
+        GameObject wall4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall4.transform.position = new Vector3(terrainBounds.max.x,terrainBounds.center.y,terrainBounds.center.z);
+        wall4.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
     }
     private void SetPlayers()
     {
         Player1 = new Player(Player.Scheme.Arrow);
-        Player2 = new PseudoRandomPlayer();
+        Player2 = new RandomPlayer();
     }
 
     void Update()
