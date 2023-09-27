@@ -16,16 +16,26 @@ public struct Paddle
 
     public Moveable Moveable => _moveable;
 
-   public void Move(Action agentInput, float delta)
+   public void Move(ref Bounds terrainBounds, Action agentInput, float delta)
    {
       switch (agentInput)
       {
          case Action.Up:
             Moveable.Move(Vector3.right * delta);
+            if(
+               !terrainBounds.Contains(_moveable.Bounds.min)
+               ||
+               !terrainBounds.Contains(_moveable.Bounds.max)
+               ) Moveable.Move(Vector3.left * delta);
             break;
          
          case Action.Down:
             Moveable.Move(Vector3.left * delta);
+            if(
+               !terrainBounds.Contains(_moveable.Bounds.min)
+               ||
+               !terrainBounds.Contains(_moveable.Bounds.max)
+            ) Moveable.Move(Vector3.right * delta);
             break;
          
          case Action.None:

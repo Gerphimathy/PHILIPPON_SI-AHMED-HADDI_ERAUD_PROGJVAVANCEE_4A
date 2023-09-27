@@ -44,8 +44,8 @@ public class GameState
 
     public void Tick(Action actionAgent1, Action actionAgent2, float delta)
     {
-        _paddle1.Move(actionAgent1, delta);
-        _paddle2.Move(actionAgent2, delta);
+        _paddle1.Move(ref _terrainBounds, actionAgent1, delta);
+        _paddle2.Move(ref _terrainBounds, actionAgent2, delta);
         
         _ball.Move(ref _terrainBounds, delta);
         if (!_terrainBounds.Contains(_ball.Moveable.Bounds.center)) _ball.Direction.x *= -1f;
