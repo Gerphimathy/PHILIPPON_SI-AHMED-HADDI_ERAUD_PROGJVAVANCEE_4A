@@ -9,7 +9,7 @@ namespace MCTS
     public class MCTSNode
     {
         private MCTSNode _parent;
-        private List<MCTSNode> _childrens;
+        private List<MCTSNode> _childrens=new List<MCTSNode>();
         private GameState _gameState;
         private Action _parentAction;
         private bool _expanded = false;
@@ -51,7 +51,7 @@ namespace MCTS
             return son;
         }
 
-        internal void Simulate()
+        internal void Simulate(bool isP1)
         {
             for (int sim = 0; sim < MCTSPlayer.nbSimulation; sim++)
             {
@@ -60,6 +60,12 @@ namespace MCTS
                     var a1 = MCTSPlayer.RandomValue(GetPossibleActions(0));
                     var a2 = MCTSPlayer.RandomValue(GetPossibleActions(1));
                     _gameState.Tick(a1, a2, MCTSPlayer.deltaTime);
+                }
+                _total++;
+                if(isP1 ^ _gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                {
+                    Debug.LogWarning("To do, add draw");
+                    _wins++;
                 }
             }
         }

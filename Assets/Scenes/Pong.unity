@@ -5604,7 +5604,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   p1Type: 0
-  p2Type: 1
+  p2Type: 3
   paddleGo1: {fileID: 259642702}
   paddleGo2: {fileID: 104315988}
   ballGo: {fileID: 682818956}

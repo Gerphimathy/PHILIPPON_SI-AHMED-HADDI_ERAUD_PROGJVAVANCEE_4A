@@ -13,23 +13,26 @@ namespace MCTS
         private const int _nbSearch = 20;
         public const int nbSimulation = 20;
         public const float deltaTime = 1 / 60f;
+        private bool isP1;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
         private List<MCTSNode> _allNodes;
 
-        public MCTSPlayer(GameState gameState)
+        public MCTSPlayer(GameState gameState, bool isP1)
         {
             _root = new(gameState);
+            _allNodes = new List<MCTSNode>();
+            _allNodes.Add(_root);
+            this.isP1 = isP1;
         }
         public Action BestMove()
         {
             for (int it = 0; it < _nbSearch; it++)
             {
-                MCTSNode current = new(gameState);
                 MCTSNode explored = Select();
                 MCTSNode expanded = explored.Expand();
-                explored.Simulate();
+                explored.Simulate(isP1);
                 expanded.BackPropagation();
             }
             MCTSNode best = MaxValue(_root.Childrens);
@@ -54,7 +57,7 @@ namespace MCTS
 
         private MCTSNode BestNode()
         {
-            return RandomValue(_allNodes);
+            return MaxValue(_allNodes);
         }
         public static MCTSNode MaxValue(IList<MCTSNode> en)
         {

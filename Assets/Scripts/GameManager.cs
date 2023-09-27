@@ -55,20 +55,20 @@ public class GameManager : MonoBehaviour
     }
     private void SetPlayers()
     {
-        Player1 = NewPlayer(p1Type);
+        Player1 = NewPlayer(p1Type,true);
         if (p1Type == p2Type && p1Type == PlayerType.Human)
-            Player2 = NewPlayer(p2Type);
-        else
             Player2 = new Player(Player.Scheme.ZQSD);
+        else
+            Player2 = NewPlayer(p2Type,false);
     }
-    private IPlayer NewPlayer(PlayerType t)
+    private IPlayer NewPlayer(PlayerType t,bool isP1)
     {
         IPlayer i = t switch
         {
             PlayerType.Human => new Player(Player.Scheme.Arrow),
             PlayerType.Random => new RandomPlayer(),
             PlayerType.PseudoRandom => new PseudoRandomPlayer(),
-            PlayerType.MonteCarlo => new MCTSPlayer(_gameState),
+            PlayerType.MonteCarlo => new MCTSPlayer(_gameState,isP1),
         };
         return i;
     }
