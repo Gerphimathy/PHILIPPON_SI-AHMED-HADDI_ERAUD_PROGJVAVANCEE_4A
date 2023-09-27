@@ -12,11 +12,16 @@ public class GameState
     private Ball _ball;
     private Bounds _terrainBounds;
 
+    private float _timer;
+
+    public float Timer => _timer;
+
     public enum GameStatusEnum
     {
         Player1Win = -1,
         Ongoing = 0,
-        Player2Win
+        Player2Win = 1,
+        Draw = 2
     }
 
     private GameStatusEnum _gameStatus;
@@ -24,13 +29,14 @@ public class GameState
     public GameStatusEnum GameStatus => _gameStatus;
 
 
-    public GameState(Paddle paddle1, Paddle paddle2, Ball ball, Bounds terrainBounds)
+    public GameState(Paddle paddle1, Paddle paddle2, Ball ball, Bounds terrainBounds, float timer)
     {
         _paddle1 = paddle1;
         _paddle2 = paddle2;
         _ball = ball;
         _terrainBounds = terrainBounds;
         _gameStatus = GameStatusEnum.Ongoing;
+        _timer = timer;
     }
 
     public Paddle Paddle1 => _paddle1;
@@ -75,8 +81,10 @@ public class GameState
         
         _ball.Move(ref _terrainBounds, delta);
         
+        _timer -= delta;
+        if (_timer <= 0) _gameStatus = GameStatusEnum.Draw;
         
-        if (!_terrainBounds.Intersects(_ball.Moveable.Bounds))
+        if (!_terrainBounds.Intersects(_ball.Moveable.Bounds) && _gameStatus == GameStatusEnum.Ongoing)
         {
             var ballCenter = _ball.Moveable.Bounds.center;
             var closestPoint = _terrainBounds.ClosestPoint(ballCenter);
