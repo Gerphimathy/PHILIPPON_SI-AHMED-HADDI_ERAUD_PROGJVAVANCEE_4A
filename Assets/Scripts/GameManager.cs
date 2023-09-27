@@ -2,14 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pong;
+using MCTS;
 
 public class GameManager : MonoBehaviour
 {
+    public enum PlayerType
+    {
+        Human,Random,PseudoRandom,MonteCarlo
+    }
     private GameState _gameState;
-    
+
+    public PlayerType p1Type;
+    public PlayerType p2Type;
     public IPlayer Player1;
     public IPlayer Player2;
 
+    [Header("Reference")]
     public GameObject paddleGo1;
     public GameObject paddleGo2;
     public GameObject ballGo;
@@ -44,8 +52,22 @@ public class GameManager : MonoBehaviour
     }
     private void SetPlayers()
     {
-        Player1 = new Player(Player.Scheme.Arrow);
-        Player2 = new RandomPlayer();
+        Player1 = NewPlayer(p1Type);
+        if (p1Type == p2Type && p1Type == PlayerType.Human)
+            Player2 = NewPlayer(p2Type);
+        else
+            Player2 = new Player(Player.Scheme.ZQSD);
+    }
+    private IPlayer NewPlayer(PlayerType t)
+    {
+        IPlayer i = t switch
+        {
+            PlayerType.Human => new Player(Player.Scheme.Arrow),
+            PlayerType.Random => new RandomPlayer(),
+            PlayerType.PseudoRandom => new PseudoRandomPlayer(),
+            PlayerType.MonteCarlo => new MCTSPlayer(_gameState),
+        };
+        return i;
     }
 
     void Update()
