@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
     private void SetPlayers()
     {
         Player1 = NewPlayer(p1Type);
-        if (p1Type == p2Type && p1Type == PlayerType.Human)
+        if (! (p1Type == p2Type && p1Type == PlayerType.Human))
             Player2 = NewPlayer(p2Type);
         else
             Player2 = new Player(Player.Scheme.ZQSD);
@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
             PlayerType.Random => new RandomPlayer(),
             PlayerType.PseudoRandom => new PseudoRandomPlayer(),
             PlayerType.MonteCarlo => new MCTSPlayer(_gameState),
+            _ => throw new ArgumentOutOfRangeException(nameof(t), t, null)
         };
         return i;
     }
