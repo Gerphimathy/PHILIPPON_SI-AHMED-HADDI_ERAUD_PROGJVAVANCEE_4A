@@ -1,7 +1,7 @@
+using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-
-using Pong;
+using Action = Pong.Action;
 
 public class GameState
 
@@ -48,7 +48,17 @@ public class GameState
         _paddle2.Move(actionAgent2, delta);
         
         _ball.Move(ref _terrainBounds, delta);
+        if (!_terrainBounds.Contains(_ball.Moveable.Bounds.center)) _ball.Direction.x *= -1f;
 
+        if (_ball.Moveable.Bounds.Intersects(_paddle1.Moveable.Bounds) ||
+            _ball.Moveable.Bounds.Intersects(_paddle2.Moveable.Bounds))
+        {
+            _ball.Direction.z *= -1f;
+        }
+
+        _ball.Move(ref _terrainBounds, delta);
+        
+        
         if (!_terrainBounds.Intersects(_ball.Moveable.Bounds))
         {
             var ballCenter = _ball.Moveable.Bounds.center;
@@ -58,6 +68,8 @@ public class GameState
 
             if (difference > 0.01) _gameStatus = GameStatusEnum.Player2Win;
             else if (difference < 0.01) _gameStatus = GameStatusEnum.Player1Win;
+            
+            Debug.Log(_gameStatus);
 
         }
     }

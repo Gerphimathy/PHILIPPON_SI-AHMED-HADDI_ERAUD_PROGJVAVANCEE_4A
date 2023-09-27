@@ -19,9 +19,10 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
-        var paddle1 = new Paddle( new Moveable(1f, paddleGo1.transform.position,paddleGo1.transform.lossyScale));
-        var paddle2 = new Paddle( new Moveable(1f, paddleGo2.transform.position,paddleGo2.transform.lossyScale));
-        var ball = new Ball(new Moveable(),new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
+        var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.lossyScale));
+        var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.lossyScale));
+        var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
+            new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
         SetPlayers();
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
     }
