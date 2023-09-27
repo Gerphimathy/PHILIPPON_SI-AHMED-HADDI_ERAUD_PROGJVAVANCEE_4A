@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pong;
 using MCTS;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,9 +29,10 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
-        var paddle1 = new Paddle( new Moveable(1f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
-        var paddle2 = new Paddle( new Moveable(1f, paddleGo2.transform.position,paddleGo1.transform.GetChild(0).localScale));
-        var ball = new Ball(new Moveable(),new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
+        var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
+        var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.GetChild(0).localScale));
+        var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
+            new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
         SetPlayers();
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
         
@@ -70,13 +73,28 @@ public class GameManager : MonoBehaviour
         return i;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawCube(_gameState.Ball.Moveable.Bounds.center,_gameState.Ball.Moveable.Bounds.size);
+        Gizmos.DrawCube(_gameState.Paddle1.Moveable.Bounds.center,_gameState.Paddle1.Moveable.Bounds.size);
+        Gizmos.DrawCube(_gameState.Paddle2.Moveable.Bounds.center,_gameState.Paddle2.Moveable.Bounds.size);
+        Gizmos.DrawCube(_gameState.TerrainBounds.center,_gameState.TerrainBounds.size);
+
+    }
+
     void Update()
     {
         //To-do find a way to update bot players game states
 
         //
         _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
-        SyncMovables();   
+        SyncMovables();
+
+        if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
+        {
+            Destroy(ballGo.gameObject);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
     
     void SyncMovables()
