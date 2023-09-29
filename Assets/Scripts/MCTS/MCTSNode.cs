@@ -21,7 +21,7 @@ namespace MCTS
         private RandomPlayer p1 = new RandomPlayer(true);
         private RandomPlayer p2 = new RandomPlayer(false);
         //When we'll firstly try to get the score of the root for selecting bestNode on very first iteration we'll have a total score = to zero
-        public float Score => _total != 0 ? _wins / _total : float.MinValue + 1;
+        public float Score => _total != 0 ? (_wins / _total) : float.MinValue + 1;
 
 
         public MCTSNode(GameState gameState)
@@ -66,45 +66,52 @@ namespace MCTS
 
         internal void Simulate(bool isP1)
         {
+
             for (int sim = 0; sim < MCTSPlayer.nbSimulation; sim++)
             {
-                while (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
+                var currentSim = this._gameState;
+                while (currentSim.GameStatus == GameState.GameStatusEnum.Ongoing)
                 {
-                    var a1 = p1.GetValidAction(ref _gameState, true, MCTSPlayer.deltaTime);
-                    var a2 = p2.GetValidAction(ref _gameState, false, MCTSPlayer.deltaTime);
-                    _gameState.Tick(a1, a2, MCTSPlayer.deltaTime);
+                    var a1 = p1.GetValidAction(ref currentSim, true, MCTSPlayer.deltaTime);
+                    var a2 = p2.GetValidAction(ref currentSim, false, MCTSPlayer.deltaTime);
+                    currentSim.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
-                _total += _gameState.InitialTimer;
-                if (_gameState.GameStatus != GameState.GameStatusEnum.Draw)
+                Debug.Log(_total + " total");
+                _total += currentSim.InitialTimer;
+                if (currentSim.GameStatus != GameState.GameStatusEnum.Draw)
                 {
+                    Debug.Log(currentSim.Timer+", "+this.Score+",,"+_wins+" : "+ currentSim.GameStatus);
+                    //Win();
                     if (isP1)
                     {
-                        if (_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
-                            Win();
+                        if (currentSim.GameStatus == GameState.GameStatusEnum.Player1Win)
+                            Lose(ref currentSim);
                         else
-                            Lose();
+                            Win(ref currentSim);
                     }
                     else
                     {
-                        if (_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
-                            Win();
+                        if (currentSim.GameStatus == GameState.GameStatusEnum.Player2Win)
+                            Lose(ref currentSim);
                         else
-                            Lose();
+                            Win(ref currentSim);
                     }
+                    Debug.Log(currentSim.Timer+", "+this.Score);
                 }
             }
         }
-        void Lose()
+        void Win(ref GameState _gameState)
+        {
+            // We won
+            Debug.Log("Won " + _gameState.Timer);
+            _wins += _gameState.Timer;
+        }
+        void Lose(ref GameState _gameState)
         {
             //Debug.Log("Removing " + _gameState.Timer);
             //We lost
-            _wins -= _gameState.Timer / 100f;
-        }
-        void Win()
-        {
-            // We won
-            //Debug.Log("Adding " + _gameState.Timer);
-            _wins += _gameState.Timer;
+            _wins -= 0;
+            //_wins -=_gameState.Timer / 100f;
         }
 
         internal void BackPropagation()
@@ -113,11 +120,12 @@ namespace MCTS
         }
         private void BackPropagation(float wins, float total)
         {
+            Debug.Log(this.Score+" current propagated score");
             if (_parent == null)
                 return;
             _parent._wins += wins;
             _parent._total += total;
-            _parent.BackPropagation(wins, total);
+            _parent.BackPropagation(_wins, _total);
         }
 
         public MCTSNode Parent { get => _parent; }
