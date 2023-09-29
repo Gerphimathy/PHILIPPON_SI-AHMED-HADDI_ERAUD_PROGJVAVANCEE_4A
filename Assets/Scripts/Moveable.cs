@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public struct Moveable
 {
     private float _speed;
-    private Bounds _bounds;
+    public Bounds Bounds;
 
     public Moveable(float speed=1f) : this(speed,Vector3.zero,Vector3.one)
     {
@@ -15,20 +16,17 @@ public struct Moveable
     public Moveable(float speed, Vector3 boundsPosition, Vector3 boundsSize)
     {
         _speed = speed;
-        _bounds = new Bounds();
-        _bounds.center = boundsPosition;
-        _bounds.size = boundsSize;
+        Bounds = new Bounds();
+        Bounds.center = boundsPosition;
+        Bounds.size = boundsSize;
     }
 
     public float Speed => _speed;
 
-    public Bounds Bounds => _bounds;
 
     public void Move(Vector3 displacement)
     {
-        _bounds.center += displacement * _speed;
+        Bounds.center += displacement * _speed;
     }
-
-
 
 }

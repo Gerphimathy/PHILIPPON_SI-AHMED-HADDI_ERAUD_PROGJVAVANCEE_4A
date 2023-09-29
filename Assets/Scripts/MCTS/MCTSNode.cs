@@ -12,30 +12,30 @@ namespace MCTS
     {
         private int _depth = 0;
         private MCTSNode _parent;
-        private List<MCTSNode> _childrens = new List<MCTSNode>();
+        private List<MCTSNode> _childrens = new ();
         private GameState _gameState;
         private Action _parentAction;
         private bool _expanded = false;
         private float _wins;
         private float _total;
-        private RandomPlayer p1 = new RandomPlayer(true);
-        private RandomPlayer p2 = new RandomPlayer(false);
+        private RandomPlayer p1 = new (true);
+        private RandomPlayer p2 = new (false);
         private List<Action> _availableActions;
         //When we'll firstly try to get the score of the root for selecting bestNode on very first iteration we'll have a total score = to zero
         public float Score => _total != 0 ? (_wins / _total) : float.MinValue + 1;
 
 
-        public MCTSNode(GameState gameState)
+        public MCTSNode(ref GameState gameState)
         {
             _gameState = new GameState(gameState);
         }
-        public MCTSNode(MCTSNode parent, Action parentAction,bool isP1) : this(parent.GameState)
+        public MCTSNode(MCTSNode parent, Action parentAction,bool isP1) : this(ref parent.GameState)
         {
-            this._parent = parent;
-            this._parentAction = parentAction;
+            _parent = parent;
+            _parentAction = parentAction;
             parent._childrens.Add(this);
-            this._depth = parent._depth + 1;
-            this._gameState.Tick(isP1 ? parentAction : Action.None, !isP1 ? parentAction : Action.None, MCTSPlayer.deltaTime);
+            _depth = parent._depth + 1;
+            _gameState.Tick(isP1 ? parentAction : Action.None, !isP1 ? parentAction : Action.None, MCTSPlayer.deltaTime);
         }
         public IEnumerable<Action> GetPossibleActions(bool isP1)
         {
@@ -47,6 +47,8 @@ namespace MCTS
             bool player = forcePlayer ?? _depth % 2 == 0;
             //If never expanded i.e we never determined possible actions we do it now but we'll keep the list for the other steps, on a given game state, available actions won't change
             _availableActions ??= GetPossibleActions(player).ToList();
+            
+            /*
             for (int i = 0; i < _availableActions.Count; i++)
             {
                 foreach (var c in _childrens)
@@ -59,6 +61,17 @@ namespace MCTS
                     }
                 }
             }
+            */
+            
+            foreach (var c in _childrens)
+            {
+                if (_availableActions.Contains(c._parentAction) )
+                {
+                    _availableActions.Remove(c._parentAction);
+                    break;
+                }
+            }
+            
             //Debug.Log("Exanding from" + this.Expanded + "," + string.Join(',', this.Childrens.Select(s => s._parentAction.ToString())) + ";;;;" + string.Join(',', GetPossibleActions(player)) + ",," + this._parentAction + " with available actions " + _availableActions.Count);
             Assert.IsTrue(_availableActions != null && _availableActions.Count != 0);
             var son = new MCTSNode(this, MCTSPlayer.RandomValue(_availableActions),player);
@@ -72,11 +85,11 @@ namespace MCTS
 
             for (int sim = 0; sim < MCTSPlayer.nbSimulation; sim++)
             {
-                var currentSim = this._gameState;
+                var currentSim = _gameState;
                 while (currentSim.GameStatus == GameState.GameStatusEnum.Ongoing)
                 {
-                    var a1 = p1.GetValidAction(currentSim, true, MCTSPlayer.deltaTime);
-                    var a2 = p2.GetValidAction(currentSim, false, MCTSPlayer.deltaTime);
+                    var a1 = p1.GetValidAction(ref currentSim, true, MCTSPlayer.deltaTime);
+                    var a2 = p2.GetValidAction(ref currentSim, false, MCTSPlayer.deltaTime);
                     currentSim.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
                 //Debug.Log(_total + " total");
@@ -113,7 +126,6 @@ namespace MCTS
         {
             //Debug.Log("Removing " + _gameState.Timer);
             //We lost
-            _wins -= 0;
             _wins -=sim.Timer;
         }
 
@@ -133,7 +145,7 @@ namespace MCTS
 
         public MCTSNode Parent { get => _parent; }
         public Action ParentAction { get => _parentAction; }
-        public GameState GameState { get => _gameState; }
+        public ref GameState GameState { get => ref _gameState; }
         public List<MCTSNode> Childrens { get => _childrens; }
         public bool Expanded { get => _expanded; }
     }

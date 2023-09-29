@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Action = Pong.Action;
@@ -8,7 +10,32 @@ using Action = Pong.Action;
 public struct GameState
 
 {
+    private static readonly NativeArray<Action> ActionList = new (3, Allocator.Persistent) {
+        [0] = Action.Up, [1] = Action.Down, [2]= Action.None
+    };
 
+    
+    /// <summary>
+    /// Emplacements mémoire réservés pour utilisation de Burst pour la méthode GetPossibleAction
+    /// </summary>
+    private static NativeArray<Action> ActionBufferZero = new(0, Allocator.Persistent);
+
+    private static NativeArray<Action> ActionBufferOne = new(1, Allocator.Persistent)
+    {
+        [0] = Action.None
+    };
+    
+    private static NativeArray<Action> ActionBufferTwo = new(2, Allocator.Persistent)
+    {
+        [0] = Action.None, [1] = Action.None
+    };
+    
+    
+    private static NativeArray<Action> ActionBufferThree = new(3, Allocator.Persistent)
+    {
+        [0] = Action.None, [1] = Action.None, [2] = Action.None
+    };
+    
     private Paddle _paddle1;
     private Paddle _paddle2;
     private Ball _ball;
@@ -71,18 +98,41 @@ public struct GameState
     public Ball Ball => _ball;
 
     public Bounds TerrainBounds => _terrainBounds;
-    public List<Action> GetPossibleActions(bool player, float? delta = null)
+    
+    [BurstCompile(CompileSynchronously = true)]
+    public NativeArray<Action> GetPossibleActions(bool player, float delta)
     {
-        var l = new List<Action>();
-        if (!delta.HasValue)
-            delta = Time.deltaTime;
-        var actions = (Action[])Enum.GetValues(typeof(Action));
-        for (int i = 0; i < actions.Length; i++)
+        Assert.IsTrue(ActionList.IsCreated);
+        int j = 0;
+        for (int i = 0; i < ActionList.Length; i++)
         {
-            if (isActionValid(actions[i], player, delta.Value))
-                l.Add(actions[i]);
+            if (isActionValid(ActionList[i], player, delta))
+            {
+                ActionBufferThree[j] = ActionList[i];
+                switch (j)
+                {
+                    case 0:
+                        ActionBufferOne[j] = ActionList[i];
+                        goto case 1;
+                    case 1:
+                        ActionBufferTwo[j] = ActionList[i];
+                        goto case 2;
+                    case 2:
+                        ActionBufferThree[j] = ActionList[i];
+                        break;
+                }
+                ++j;
+            }
         }
-        return l;
+
+        return j switch
+        {
+            0 => ActionBufferZero,
+            1 => ActionBufferOne,
+            2 => ActionBufferTwo,
+            3 => ActionBufferThree,
+            _ => ActionBufferZero
+        };
     }
     public bool isActionValid(Action a, bool player, float delta)
     {
@@ -90,31 +140,24 @@ public struct GameState
             return true;
         //Copied version because struct, we can move it no problem;
         Moveable target = (player ? Paddle1 : Paddle2).Moveable;
+        Vector3 leftDelta = Vector3.left * delta;
         if (a == Action.Up)
         {
-            target.Move(Vector3.right * delta);
-            bool valid = (_terrainBounds.Contains(target.Bounds.min)
-               &&
-               _terrainBounds.Contains(target.Bounds.max));
-            target.Move(Vector3.left * delta);
-            return valid;
+            target.Move(-leftDelta);
+            return _terrainBounds.max.x > target.Bounds.max.x;
         }
         if (a == Action.Down)
         {
-            target.Move(Vector3.left * delta);
-            bool valid = (_terrainBounds.Contains(target.Bounds.min)
-               &&
-               _terrainBounds.Contains(target.Bounds.max));
-            target.Move(Vector3.right * delta);
-            return valid;
+            target.Move(leftDelta);
+            return _terrainBounds.min.x < target.Bounds.min.x;
         }
         throw new Exception("Unsupported action");
     }
     public void Tick(Action actionAgent1, Action actionAgent2, float delta)
     {
-        if (isActionValid(actionAgent1, true, delta))
+        //if (isActionValid(actionAgent1, true, delta))
             _paddle1.Move(ref _terrainBounds, actionAgent1, delta);
-        if (isActionValid(actionAgent2, false, delta))
+        //if (isActionValid(actionAgent2, false, delta))
             _paddle2.Move(ref _terrainBounds, actionAgent2, delta);
 
         _ball.Move(ref _terrainBounds, delta);
@@ -122,9 +165,9 @@ public struct GameState
             _ball.Direction.x *= -1f;
 
 
-        var paddle1Bounds = _paddle1.Moveable.Bounds;
-        var paddle2Bounds = _paddle2.Moveable.Bounds;
-        var ballBounds = _ball.Moveable.Bounds;
+        ref var paddle1Bounds = ref _paddle1.Moveable.Bounds;
+        ref var paddle2Bounds = ref _paddle2.Moveable.Bounds;
+        ref var ballBounds = ref _ball.Moveable.Bounds;
 
         if (ballBounds.Intersects(paddle1Bounds))
         {
@@ -155,10 +198,10 @@ public struct GameState
 
             var difference = ballCenter.z - closestPoint.z;
 
-            if (difference > 0.01) _gameStatus = GameStatusEnum.Player2Win;
-            else if (difference < 0.01) _gameStatus = GameStatusEnum.Player1Win;
+            if (difference > 0.02) _gameStatus = GameStatusEnum.Player2Win;
+            else if (difference < 0.02) _gameStatus = GameStatusEnum.Player1Win;
 
-            Debug.Log(_gameStatus);
+            //Debug.Log(_gameStatus);
 
         }
     }

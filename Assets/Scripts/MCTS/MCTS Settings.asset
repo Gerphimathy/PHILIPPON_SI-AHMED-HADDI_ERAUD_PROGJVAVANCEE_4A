@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: MCTS Settings
   m_EditorClassIdentifier: 
   explorationFactor: 0.35
-  nbSearch: 120
-  nbSimulation: 25
-  deltaTime: 0.3
+  nbSearch: 100
+  nbSimulation: 24
+  deltaTime: 0.2

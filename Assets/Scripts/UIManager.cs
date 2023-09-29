@@ -44,13 +44,13 @@ public class UIManager : MonoBehaviour
     public void OnPlayerOneDropDownChanged(TMP_Dropdown change)
     {
         gameManager.P1Type = (GameManager.PlayerType)change.value;
-        Debug.Log(gameManager.P1Type);
+        //Debug.Log(gameManager.P1Type);
     }
     
     public void OnPlayerTwoDropDownChanged(TMP_Dropdown change)
     {
         gameManager.P2Type = (GameManager.PlayerType)change.value;
-        Debug.Log(gameManager.P2Type);
+        //Debug.Log(gameManager.P2Type);
     }
 
     public void OnOptionsButtonPressed()

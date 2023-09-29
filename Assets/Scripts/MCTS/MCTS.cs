@@ -13,10 +13,9 @@ namespace MCTS
         {
 
         }
-        private void Init(GameState gameState)
+        private void Init(ref GameState gameState)
         {
-            var copy = new GameState(gameState);
-            _root = new(copy);
+            _root = new(ref gameState);
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
@@ -41,13 +40,12 @@ namespace MCTS
                 expanded.BackPropagation();
             }
             MCTSNode best = MaxValue(_root.Childrens);
-            Debug.LogWarning("Optimal is : "+ best + " : " + best.Score);
+            //Debug.LogWarning("Optimal is : "+ best + " : " + best.Score);
             return best.ParentAction;
-            return Action.None;
         }
         public MCTSNode Select()
         {
-            if (UnityEngine.Random.Range(0, 1f) < _explorationFactor)
+            if (Random.Range(0, 1f) < _explorationFactor)
             {
                 return RandomNode();
             }
@@ -99,9 +97,9 @@ namespace MCTS
             }
         }
 
-        public override Action GetAction(GameState gameState)
+        public override Action GetAction(ref GameState gameState)
         {
-            Init(gameState);
+            Init(ref gameState);
             return BestMove();
         }
 

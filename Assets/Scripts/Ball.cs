@@ -4,10 +4,8 @@ using UnityEngine;
 public struct Ball
 {
 
-    private Moveable _moveable;
+    public Moveable Moveable;
     
-    public Moveable Moveable => _moveable;
-
     public Vector3 Direction;
     
 
@@ -19,7 +17,7 @@ public struct Ball
     
     public Ball(Moveable moveable, Vector3 direction, ref Moveable paddle1Moveable, ref Moveable paddle2Moveable)
     {
-        _moveable = moveable;
+        Moveable = moveable;
         Direction = direction;
         _paddle1Moveable = paddle1Moveable;
         _paddle2Moveable = paddle2Moveable;
@@ -27,6 +25,10 @@ public struct Ball
 
     public void Move(ref Bounds terrainBounds, float delta)
     {
-        _moveable.Move(Direction.normalized * delta);
+        Moveable.Move(Direction.normalized * delta);
+        if (Moveable.Bounds.center.x < terrainBounds.center.x - terrainBounds.size.x)
+            Moveable.Bounds.center.Set(terrainBounds.center.x - terrainBounds.size.x, Moveable.Bounds.center.y, Moveable.Bounds.center.z);
+        if (Moveable.Bounds.center.x > terrainBounds.center.x + terrainBounds.size.x)
+            Moveable.Bounds.center.Set(terrainBounds.center.x + terrainBounds.size.x, Moveable.Bounds.center.y, Moveable.Bounds.center.z);
     }
 }
