@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     }
     private GameState _gameState;
 
+    public GameState GameState => _gameState;
+
     public PlayerType p1Type;
     public PlayerType p2Type;
     public IPlayer Player1;
@@ -23,6 +25,8 @@ public class GameManager : MonoBehaviour
     public GameObject paddleGo1;
     public GameObject paddleGo2;
     public GameObject ballGo;
+    
+    public float initialTimer = 60f;
     
     [SerializeField] 
     public Bounds terrainBounds;
@@ -34,7 +38,7 @@ public class GameManager : MonoBehaviour
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
             new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
         SetPlayers();
-        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
+        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
         
         //Create cube object walls that match _terrainBounds
         GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
