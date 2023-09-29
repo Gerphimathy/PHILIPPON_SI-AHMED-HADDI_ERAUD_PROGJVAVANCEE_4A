@@ -3,8 +3,12 @@ using UnityEngine;
 using Action = Pong.Action;
 
 
-public class Player : IPlayer
+public class Player : APlayer
 {
+    public Player(bool isP1) : base(isP1)
+    {
+        SetScheme(isP1 ? Scheme.ZQSD : Scheme.Arrow);
+    }
     public enum Scheme
     {
         Arrow,
@@ -15,7 +19,7 @@ public class Player : IPlayer
     private KeyCode _up;
     private KeyCode _down;
     
-    public Player(Scheme scheme)
+    public void SetScheme(Scheme scheme)
     {
         switch (scheme)
         {
@@ -24,7 +28,7 @@ public class Player : IPlayer
                 _down = KeyCode.DownArrow;
                 break;
             case Scheme.ZQSD:
-                _up = KeyCode.Z;
+                _up = KeyCode.W;
                 _down = KeyCode.S;
                 break;
             default:
@@ -32,7 +36,7 @@ public class Player : IPlayer
         }
     }
     
-    public Action GetAction()
+    public override Action GetAction(ref GameState gameState)
     {
         if (Input.GetKey(_up))
             return Action.Up;

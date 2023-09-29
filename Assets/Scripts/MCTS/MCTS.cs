@@ -7,25 +7,27 @@ using Pong;
 
 namespace MCTS
 {
-    public class MCTSPlayer : IPlayer
+    public class MCTSPlayer : APlayer
     {
+        public MCTSPlayer(bool isP1) : base(isP1)
+        {
+            
+        }
+        private void Init(GameState gameState)
+        {
+            _root = new(gameState);
+            _allNodes = new List<MCTSNode>();
+            _allNodes.Add(_root);
+        }
         private const float _explorationFactor = .8f;
-        private const int _nbSearch = 20;
-        public const int nbSimulation = 20;
-        public const float deltaTime = 1 / 60f;
-        private bool isP1;
+        private const int _nbSearch = 200;
+        public const int nbSimulation = 30;
+        public const float deltaTime = 1/10f;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
         private List<MCTSNode> _allNodes;
 
-        public MCTSPlayer(GameState gameState, bool isP1)
-        {
-            _root = new(gameState);
-            _allNodes = new List<MCTSNode>();
-            _allNodes.Add(_root);
-            this.isP1 = isP1;
-        }
         public Action BestMove()
         {
             for (int it = 0; it < _nbSearch; it++)
@@ -76,15 +78,16 @@ namespace MCTS
         private void ExploreTree(MCTSNode root, List<MCTSNode> visited)
         {
             Assert.IsTrue(visited != null);
+            visited.Add(root);
             foreach (var node in root.Childrens.Where(n => !n.Expanded))
             {
-                visited.Add(node);
                 ExploreTree(node, visited);
             }
         }
 
-        public Action GetAction()
+        public override Action GetAction(ref GameState gameState)
         {
+            Init(gameState);
             return BestMove();
         }
     }

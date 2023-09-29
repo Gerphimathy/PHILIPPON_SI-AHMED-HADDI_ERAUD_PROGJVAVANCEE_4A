@@ -4,14 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Action = Pong.Action;
 
-public class PseudoRandomPlayer : IPlayer
+public class PseudoRandomPlayer : APlayer
 {
     private float _remainingTime = 0;
     private float _timeBetweenActions = 3f;
     private float _timeBetweenActionsRandomRange = 0.5f;
     private Action _lastAction = Action.None;
-    
-    public Action GetAction()
+    public PseudoRandomPlayer(bool isP1) : base(isP1)
+    {
+
+    }
+    public override Action GetAction(ref GameState gameState)
     {
         _remainingTime -= Time.deltaTime;
         if (_remainingTime <= 0)

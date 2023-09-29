@@ -27,9 +27,9 @@ namespace MCTS
             this._parentAction = parentAction;
             node._childrens.Add(this);
         }
-        public static List<Action> GetPossibleActions(int playerIndex)
+        public static List<Action> GetPossibleActions(bool isP1)
         {
-            if(playerIndex == 0)
+            if(isP1)
             {
 
             }
@@ -37,13 +37,13 @@ namespace MCTS
             {
 
             }
-            Debug.LogError("Placeholder");
+            Debug.LogWarning("Placeholder");
             return new List<Action>() { Action.Up, Action.Down, Action.None };
         }
 
         public MCTSNode Expand()
         {
-            var actions = GetPossibleActions(0);
+            var actions = GetPossibleActions(UnityEngine.Random.Range(0,2)==0);
             Assert.IsTrue(actions != null && actions.Count != 0);
             var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
             if (actions.Count == 1)
@@ -57,8 +57,8 @@ namespace MCTS
             {
                 while (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
                 {
-                    var a1 = MCTSPlayer.RandomValue(GetPossibleActions(0));
-                    var a2 = MCTSPlayer.RandomValue(GetPossibleActions(1));
+                    var a1 = MCTSPlayer.RandomValue(GetPossibleActions(true));
+                    var a2 = MCTSPlayer.RandomValue(GetPossibleActions(false));
                     _gameState.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
                 _total++;

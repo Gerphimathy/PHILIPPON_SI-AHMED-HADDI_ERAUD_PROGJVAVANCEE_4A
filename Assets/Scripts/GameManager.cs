@@ -16,8 +16,8 @@ public class GameManager : MonoBehaviour
 
     public PlayerType p1Type;
     public PlayerType p2Type;
-    public IPlayer Player1;
-    public IPlayer Player2;
+    public APlayer Player1;
+    public APlayer Player2;
 
     [Header("Reference")]
     public GameObject paddleGo1;
@@ -56,19 +56,16 @@ public class GameManager : MonoBehaviour
     private void SetPlayers()
     {
         Player1 = NewPlayer(p1Type,true);
-        if (!(p1Type == p2Type && p1Type == PlayerType.Human))
-            Player2 = NewPlayer(p2Type,false);
-        else
-            Player2 = new Player(Player.Scheme.ZQSD,false);
+        Player2 = NewPlayer(p2Type,false);
     }
-    private IPlayer NewPlayer(PlayerType t,bool isP1)
+    private APlayer NewPlayer(PlayerType t,bool isP1)
     {
-        IPlayer i = t switch
+        APlayer i = t switch
         {
-            PlayerType.Human => new Player(Player.Scheme.Arrow),
-            PlayerType.Random => new RandomPlayer(),
-            PlayerType.PseudoRandom => new PseudoRandomPlayer(),
-            PlayerType.MonteCarlo => new MCTSPlayer(_gameState,isP1),
+            PlayerType.Human => new Player(isP1),
+            PlayerType.Random => new RandomPlayer(isP1),
+            PlayerType.PseudoRandom => new PseudoRandomPlayer(isP1),
+            PlayerType.MonteCarlo => new MCTSPlayer(isP1),
             _ => throw new ArgumentOutOfRangeException(nameof(t), t, null)
         };
         return i;
@@ -88,7 +85,7 @@ public class GameManager : MonoBehaviour
         //To-do find a way to update bot players game states
 
         //
-        _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
+        _gameState.Tick(Player1.GetAction(ref _gameState), Player2.GetAction(ref _gameState), Time.deltaTime);
         SyncMovables();
 
         if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
