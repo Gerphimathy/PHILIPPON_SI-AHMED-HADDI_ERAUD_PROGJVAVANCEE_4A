@@ -149,6 +149,12 @@ public class GameManager : MonoBehaviour
         //To-do find a way to update bot players game states
         if (_isGameRunning)
         {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                _isGameRunning = false;
+                uiManager.ActivatePausePanel();
+            }
+            
             var dir = _gameState.Ball.Direction;
             _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
             SyncMovables();
@@ -210,6 +216,12 @@ public class GameManager : MonoBehaviour
         GameObject wall4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
         wall4.transform.position = new Vector3(terrainBounds.max.x,terrainBounds.center.y,terrainBounds.center.z);
         wall4.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
+    }
+
+    public void ResumeGame()
+    {
+        _isGameRunning = true;
+        uiManager.DeactivatePausePanel();
     }
     
 }
