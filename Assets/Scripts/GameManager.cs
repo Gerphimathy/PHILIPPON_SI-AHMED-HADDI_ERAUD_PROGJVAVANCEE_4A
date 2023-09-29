@@ -60,12 +60,18 @@ public class GameManager : MonoBehaviour
     
     public AudioSource pongSound;
 
+    [SerializeField]
+    private UIManager uiManager;
+
+    [SerializeField] private int maxScoreToWin;
+
     
     void Start()
     {
         _isGameRunning = false;
         _player1Score = 0;
         _player2Score = 0;
+        BuildWalls();
     }
     private void SetPlayers()
     {
@@ -74,6 +80,9 @@ public class GameManager : MonoBehaviour
             Player2 = NewPlayer(_p2Type, false);
         else
             Player2 = new Player(false);
+        
+        Assert.IsTrue(Player1 != null);
+        Assert.IsTrue(Player2 != null);
     }
     private APlayer NewPlayer(PlayerType t,bool isP1)
     {
@@ -92,9 +101,9 @@ public class GameManager : MonoBehaviour
 
     void ResetGameState(Vector3 direction)
     {
-        var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
-        var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.GetChild(0).localScale));
-        var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
+        var paddle1 = new Paddle( new Moveable(4f, paddle1InitialLocation,paddleGo1.transform.GetChild(0).localScale));
+        var paddle2 = new Paddle( new Moveable(4f, paddle2InitialLocation,paddleGo2.transform.GetChild(0).localScale));
+        var ball = new Ball(new Moveable(4f, ballInitialLocation, ballGo.transform.lossyScale),
             direction,paddle1.Moveable,paddle2.Moveable);
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
 
@@ -102,13 +111,17 @@ public class GameManager : MonoBehaviour
     
     public void InitializeGame()
     {
-        ResetGameState(new Vector3(-1f,0,-1f));
-        SetPlayers();
-        BuildWalls();
-        _isGameRunning = true;
         _player1Score = 0;
         _player2Score = 0;
+        Assert.IsTrue(_player1Score == 0);
+        Assert.IsTrue(_player2Score == 0);
         UpdateScore();
+        ResetGameState(new Vector3(-1f,0,-1f));
+        Assert.IsTrue(_gameState.GameStatus == GameState.GameStatusEnum.Ongoing);
+        SetPlayers();
+        _isGameRunning = true;
+        Assert.IsTrue(Player1 != null);
+        Assert.IsTrue(Player2 != null);
     }
     
     void ResetGame()
@@ -124,6 +137,7 @@ public class GameManager : MonoBehaviour
         
         Vector3 direction = _gameState.Ball.Direction;
         direction*= -1;
+        
         
         ResetGameState(direction);
         
@@ -144,6 +158,7 @@ public class GameManager : MonoBehaviour
             if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
             {
                 _isGameRunning = false;
+                
                 if(_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
                     _player1Score++;
                 else if(_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
@@ -152,7 +167,15 @@ public class GameManager : MonoBehaviour
                     Assert.IsTrue(_gameState.GameStatus == GameState.GameStatusEnum.Draw);
                 
                 UpdateScore();
-                ResetGame();
+
+                if (_player1Score < maxScoreToWin && _player2Score < maxScoreToWin)
+                {
+                    ResetGame();
+                }
+                else 
+                {
+                    uiManager.DisplayVictoryMenu(_player1Score >= maxScoreToWin);
+                }
             }
         }
     }

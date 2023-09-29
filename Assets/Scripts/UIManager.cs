@@ -12,21 +12,24 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject optionsPanel;
     [SerializeField] private GameObject gameUI;
+    [SerializeField] private GameObject victoryPanel;
+    [SerializeField] private TMP_Text victoryText;
 
     public void Start()
     {
         mainMenuPanel.SetActive(true);
         optionsPanel.SetActive(false);
         gameUI.SetActive(false);
+        victoryPanel.SetActive(false);
     }
 
     public void StartGame()
     {
-        gameManager.InitializeGame();
         mainMenuPanel.SetActive(false);
         optionsPanel.SetActive(false);
         gameUI.SetActive(true);
-        
+        victoryPanel.SetActive(false);
+        gameManager.InitializeGame();
     }
     
     public void ExitGame()
@@ -51,12 +54,25 @@ public class UIManager : MonoBehaviour
     {
         mainMenuPanel.SetActive(false);
         optionsPanel.SetActive(true);
+        gameUI.SetActive(false);
+        victoryPanel.SetActive(false);
     }
     
     public void OnMainMenuButtonPressed()
     {
         mainMenuPanel.SetActive(true);
         optionsPanel.SetActive(false);
+        gameUI.SetActive(false);
+        victoryPanel.SetActive(false);
+    }
+
+    public void DisplayVictoryMenu(bool isP1)
+    {
+        mainMenuPanel.SetActive(false);
+        optionsPanel.SetActive(false);
+        gameUI.SetActive(false);
+        victoryPanel.SetActive(true);
+        victoryText.text = "Player " + (isP1 ? "1" : "2") + " has won the game";
     }
 
 }
