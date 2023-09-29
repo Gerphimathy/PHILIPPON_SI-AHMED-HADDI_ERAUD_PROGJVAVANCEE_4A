@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     private int _player2Score;
     
     private PlayerType _p1Type;
-    private PlayerType _p2Type;
+    private PlayerType _p2Type=PlayerType.MonteCarlo;
 
     public PlayerType P1Type
     {
