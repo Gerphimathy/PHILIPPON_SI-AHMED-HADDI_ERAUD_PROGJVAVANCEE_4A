@@ -31,7 +31,5 @@ public struct Ball
     public void Move(ref Bounds terrainBounds, float delta)
     {
         Moveable.Move(Direction.normalized * delta);
-
-
     }
 }

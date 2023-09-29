@@ -14,10 +14,23 @@ public class GameManager : MonoBehaviour
     }
     private GameState _gameState;
 
-    public PlayerType p1Type;
-    public PlayerType p2Type;
-    public IPlayer Player1;
-    public IPlayer Player2;
+    private PlayerType _p1Type;
+    private PlayerType _p2Type;
+
+    public PlayerType P1Type
+    {
+        get => _p1Type;
+        set => _p1Type = value;
+    }
+
+    public PlayerType P2Type
+    {
+        get => _p2Type;
+        set => _p2Type = value;
+    }
+
+    private IPlayer Player1;
+    private IPlayer Player2;
 
     [Header("Reference")]
     public GameObject paddleGo1;
@@ -26,38 +39,18 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] 
     public Bounds terrainBounds;
+
+    private bool _isGameRunning;
     
     void Start()
     {
-        var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
-        var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.GetChild(0).localScale));
-        var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
-            new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
-        SetPlayers();
-        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
-        
-        //Create cube object walls that match _terrainBounds
-        GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        wall.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.min.z);
-        wall.transform.localScale = new Vector3(terrainBounds.size.x,2,0.1f);
-        
-        GameObject wall2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        wall2.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.max.z);
-        wall2.transform.localScale = new Vector3(terrainBounds.size.x,2,0.1f);
-        
-        GameObject wall3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        wall3.transform.position = new Vector3(terrainBounds.min.x,terrainBounds.center.y,terrainBounds.center.z);
-        wall3.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
-        
-        GameObject wall4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        wall4.transform.position = new Vector3(terrainBounds.max.x,terrainBounds.center.y,terrainBounds.center.z);
-        wall4.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
+        _isGameRunning = false;
     }
     private void SetPlayers()
     {
-        Player1 = NewPlayer(p1Type);
-        if (! (p1Type == p2Type && p1Type == PlayerType.Human))
-            Player2 = NewPlayer(p2Type);
+        Player1 = NewPlayer(_p1Type);
+        if (! (_p1Type == _p2Type && _p1Type == PlayerType.Human))
+            Player2 = NewPlayer(_p2Type);
         else
             Player2 = new Player(Player.Scheme.ZQSD);
     }
@@ -83,18 +76,35 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void InitializeGame()
+    {
+        var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
+        var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.GetChild(0).localScale));
+        var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
+            new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
+        SetPlayers();
+        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
+        
+        BuildWalls();
+        _isGameRunning = true;
+    }
+
     void Update()
     {
         //To-do find a way to update bot players game states
 
         //
-        _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
-        SyncMovables();
-
-        if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
+        if (_isGameRunning)
         {
-            Destroy(ballGo.gameObject);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
+            SyncMovables();
+            
+            
+
+            if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
+            {
+                _isGameRunning = false;
+            }
         }
     }
     
@@ -104,4 +114,25 @@ public class GameManager : MonoBehaviour
         paddleGo2.transform.position = _gameState.Paddle2.Moveable.Bounds.center;
         ballGo.transform.position = _gameState.Ball.Moveable.Bounds.center;
     }
+
+    private void BuildWalls()
+    {
+        //Create cube object walls that match _terrainBounds
+        GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.min.z);
+        wall.transform.localScale = new Vector3(terrainBounds.size.x,2,0.1f);
+        
+        GameObject wall2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall2.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.max.z);
+        wall2.transform.localScale = new Vector3(terrainBounds.size.x,2,0.1f);
+        
+        GameObject wall3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall3.transform.position = new Vector3(terrainBounds.min.x,terrainBounds.center.y,terrainBounds.center.z);
+        wall3.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
+        
+        GameObject wall4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        wall4.transform.position = new Vector3(terrainBounds.max.x,terrainBounds.center.y,terrainBounds.center.z);
+        wall4.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
+    }
+    
 }
