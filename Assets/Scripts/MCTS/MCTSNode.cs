@@ -3,19 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Pong;
+using System.Linq;
 
 namespace MCTS
 {
     public class MCTSNode
     {
         private MCTSNode _parent;
-        private List<MCTSNode> _childrens=new List<MCTSNode>();
+        private List<MCTSNode> _childrens = new List<MCTSNode>();
         private GameState _gameState;
         private Action _parentAction;
         private bool _expanded = false;
-        private int _wins;
-        private int _total;
-        public float Ratio => _wins / (float)_total;
+        private float _wins;
+        private float _total;
+        private RandomPlayer p1 = new RandomPlayer(true);
+        private RandomPlayer p2 = new RandomPlayer(false);
+        public float Score => _wins / _total;
+
 
         public MCTSNode(GameState gameState)
         {
@@ -27,23 +31,14 @@ namespace MCTS
             this._parentAction = parentAction;
             node._childrens.Add(this);
         }
-        public static List<Action> GetPossibleActions(bool isP1)
+        public IEnumerable<Action> GetPossibleActions(bool isP1)
         {
-            if(isP1)
-            {
-
-            }
-            else
-            {
-
-            }
-            Debug.LogWarning("Placeholder");
-            return new List<Action>() { Action.Up, Action.Down, Action.None };
+            return _gameState.GetPossibleActions(isP1, MCTSPlayer.deltaTime).ToList();
         }
 
         public MCTSNode Expand()
         {
-            var actions = GetPossibleActions(UnityEngine.Random.Range(0,2)==0);
+            var actions = GetPossibleActions(UnityEngine.Random.Range(0, 2) == 0).Except(_childrens.Select(c => c._parentAction)).ToList();
             Assert.IsTrue(actions != null && actions.Count != 0);
             var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
             if (actions.Count == 1)
@@ -57,15 +52,23 @@ namespace MCTS
             {
                 while (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
                 {
-                    var a1 = MCTSPlayer.RandomValue(GetPossibleActions(true));
-                    var a2 = MCTSPlayer.RandomValue(GetPossibleActions(false));
+                    var a1 = p1.GetValidAction(ref _gameState, true, MCTSPlayer.deltaTime);
+                    var a2 = p2.GetValidAction(ref _gameState, false, MCTSPlayer.deltaTime);
                     _gameState.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
-                _total++;
-                if(isP1 ^ _gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                _total += _gameState.InitialTimer;
+                if (_gameState.GameStatus != GameState.GameStatusEnum.Draw)
                 {
-                    Debug.LogWarning("To do, add draw");
-                    _wins++;
+                    if (isP1 ^ _gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                    {
+                        // We won
+                        _wins += _gameState.Timer;
+                    }
+                    else
+                    {
+                        //We lost
+                        _wins -= _gameState.Timer;
+                    }
                 }
             }
         }
@@ -74,11 +77,13 @@ namespace MCTS
         {
             BackPropagation(this._wins, this._total);
         }
-        private void BackPropagation(int wins,int total)
+        private void BackPropagation(float wins, float total)
         {
             if (_parent == null)
                 return;
-            _parent.BackPropagation(this._wins, this._total);
+            _parent._wins += wins;
+            _parent._total += total;
+            _parent.BackPropagation(wins, total);
         }
 
         public MCTSNode Parent { get => _parent; }

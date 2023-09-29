@@ -19,7 +19,7 @@ namespace MCTS
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
-        private const float _explorationFactor = .8f;
+        private float _explorationFactor = .5f;
         private const int _nbSearch = 200;
         public const int nbSimulation = 30;
         public const float deltaTime = 1/10f;
@@ -63,7 +63,7 @@ namespace MCTS
         }
         public static MCTSNode MaxValue(IList<MCTSNode> en)
         {
-            return en.OrderBy(n => n.Ratio).First();
+            return en.OrderByDescending(n => n.Score).First();
         }
         private MCTSNode RandomNode()
         {

@@ -30,7 +30,7 @@ public struct GameState
 
     public GameStatusEnum GameStatus => _gameStatus;
 
-
+    public readonly float InitialTimer;
     public GameState(Paddle paddle1, Paddle paddle2, Ball ball, Bounds terrainBounds, float timer)
     {
         _paddle1 = paddle1;
@@ -38,7 +38,8 @@ public struct GameState
         _ball = ball;
         _terrainBounds = terrainBounds;
         _gameStatus = GameStatusEnum.Ongoing;
-        _timer = timer;
+        InitialTimer = timer;
+        _timer = InitialTimer;
     }
 
     public Paddle Paddle1 => _paddle1;
