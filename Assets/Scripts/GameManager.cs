@@ -6,6 +6,8 @@ using Pong;
 using MCTS;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+using TMPro;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,8 +19,8 @@ public class GameManager : MonoBehaviour
 
     public GameState GameState => _gameState;
 
-    private float _player1Score = 0;
-    private float _player2Score = 0;
+    private int _player1Score;
+    private int _player2Score;
     
     private PlayerType _p1Type;
     private PlayerType _p2Type;
@@ -42,6 +44,7 @@ public class GameManager : MonoBehaviour
     public GameObject paddleGo1;
     public GameObject paddleGo2;
     public GameObject ballGo;
+    public TMP_Text scoreText;
     
     [Header("Initial Locations")]
     public Vector3 paddle1InitialLocation;
@@ -56,10 +59,13 @@ public class GameManager : MonoBehaviour
     private bool _isGameRunning;
     
     public AudioSource pongSound;
+
     
     void Start()
     {
         _isGameRunning = false;
+        _player1Score = 0;
+        _player2Score = 0;
     }
     private void SetPlayers()
     {
@@ -91,6 +97,7 @@ public class GameManager : MonoBehaviour
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
             direction,paddle1.Moveable,paddle2.Moveable);
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
+
     }
     
     public void InitializeGame()
@@ -99,6 +106,9 @@ public class GameManager : MonoBehaviour
         SetPlayers();
         BuildWalls();
         _isGameRunning = true;
+        _player1Score = 0;
+        _player2Score = 0;
+        UpdateScore();
     }
     
     void ResetGame()
@@ -110,17 +120,7 @@ public class GameManager : MonoBehaviour
         TrailRenderer trail = ballGo.GetComponent<TrailRenderer>();
         trail.Clear();
         
-        if(_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
-            _player1Score++;
-        else if(_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
-            _player2Score++;
-        else if(_gameState.GameStatus == GameState.GameStatusEnum.Draw)
-        {
-            _player1Score += .5f;
-            _player2Score += .5f;
-        }
-        else 
-            Assert.IsTrue(false);
+
         
         Vector3 direction = _gameState.Ball.Direction;
         direction*= -1;
@@ -144,10 +144,17 @@ public class GameManager : MonoBehaviour
             if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
             {
                 _isGameRunning = false;
+                if(_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
+                    _player1Score++;
+                else if(_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                    _player2Score++;
+                else
+                    Assert.IsTrue(_gameState.GameStatus == GameState.GameStatusEnum.Draw);
+                
+                UpdateScore();
+                ResetGame();
             }
         }
-        else if(Input.GetKeyDown(KeyCode.Return)) ResetGame();
-        else if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene(0);
     }
     
     void SyncMovables()
@@ -155,6 +162,11 @@ public class GameManager : MonoBehaviour
         paddleGo1.transform.position = _gameState.Paddle1.Moveable.Bounds.center;
         paddleGo2.transform.position = _gameState.Paddle2.Moveable.Bounds.center;
         ballGo.transform.position = _gameState.Ball.Moveable.Bounds.center;
+    }
+
+    void UpdateScore()
+    {
+        scoreText.text = _player1Score + " - " + _player2Score;
     }
 
     private void BuildWalls()

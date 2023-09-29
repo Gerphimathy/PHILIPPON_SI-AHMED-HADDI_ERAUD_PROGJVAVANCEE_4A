@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,11 +11,21 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameManager gameManager;
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject optionsPanel;
+    [SerializeField] private GameObject gameUI;
+
+    public void Start()
+    {
+        mainMenuPanel.SetActive(true);
+        optionsPanel.SetActive(false);
+        gameUI.SetActive(false);
+    }
 
     public void StartGame()
     {
         gameManager.InitializeGame();
         mainMenuPanel.SetActive(false);
+        optionsPanel.SetActive(false);
+        gameUI.SetActive(true);
         
     }
     
