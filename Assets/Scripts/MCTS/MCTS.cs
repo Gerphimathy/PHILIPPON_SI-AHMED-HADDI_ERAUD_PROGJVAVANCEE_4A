@@ -11,7 +11,7 @@ namespace MCTS
     {
         public MCTSPlayer(bool isP1) : base(isP1)
         {
-            
+
         }
         private void Init(GameState gameState)
         {
@@ -22,7 +22,7 @@ namespace MCTS
         private float _explorationFactor = .5f;
         private const int _nbSearch = 200;
         public const int nbSimulation = 30;
-        public const float deltaTime = 1/10f;
+        public const float deltaTime = 1 / 10f;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
@@ -33,7 +33,7 @@ namespace MCTS
             for (int it = 0; it < _nbSearch; it++)
             {
                 MCTSNode explored = Select();
-                MCTSNode expanded = explored.Expand(explored==_root ? isP1 : null);
+                MCTSNode expanded = explored.Expand(explored == _root ? isP1 : null);
                 explored.Simulate(isP1);
                 expanded.BackPropagation();
             }
@@ -78,8 +78,9 @@ namespace MCTS
         private void ExploreTree(MCTSNode root, List<MCTSNode> visited)
         {
             Assert.IsTrue(visited != null);
-            visited.Add(root);
-            foreach (var node in root.Childrens.Where(n => !n.Expanded))
+            if (!root.Expanded)
+                visited.Add(root);
+            foreach (var node in root.Childrens)
             {
                 ExploreTree(node, visited);
             }

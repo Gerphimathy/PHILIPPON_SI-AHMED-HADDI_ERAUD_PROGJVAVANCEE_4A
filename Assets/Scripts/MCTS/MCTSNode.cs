@@ -4,11 +4,13 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Pong;
 using System.Linq;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace MCTS
 {
     public class MCTSNode
     {
+        private int _depth = 0;
         private MCTSNode _parent;
         private List<MCTSNode> _childrens = new List<MCTSNode>();
         private GameState _gameState;
@@ -25,11 +27,12 @@ namespace MCTS
         {
             _gameState = gameState;
         }
-        public MCTSNode(MCTSNode node, Action parentAction) : this(node.GameState)
+        public MCTSNode(MCTSNode parent, Action parentAction) : this(parent.GameState)
         {
-            this._parent = node;
+            this._parent = parent;
             this._parentAction = parentAction;
-            node._childrens.Add(this);
+            parent._childrens.Add(this);
+            this._depth = parent._depth + 1;
         }
         public IEnumerable<Action> GetPossibleActions(bool isP1)
         {
@@ -38,7 +41,9 @@ namespace MCTS
 
         public MCTSNode Expand(bool? forcePlayer)
         {
-            var actions = GetPossibleActions(forcePlayer ?? UnityEngine.Random.Range(0, 2) == 0).Except(_childrens.Select(c => c._parentAction)).ToList();
+            bool player=_depth%2==0;
+            var actions = GetPossibleActions(player).Except(_childrens.Select(c => c._parentAction)).ToList();
+            //Debug.Log("Exanding from" + this.Expanded + "," + string.Join(',', this.Childrens.Select(s=>s._parentAction.ToString()))+";;;;"+ string.Join(',', GetPossibleActions(player))+",," +this._parentAction+" with available actions "+actions.Count);
             Assert.IsTrue(actions != null && actions.Count != 0);
             var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
             if (actions.Count == 1)
