@@ -19,10 +19,10 @@ namespace MCTS
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
-        private static float _explorationFactor;
-        private static int _nbSearch;
-        public static int nbSimulation;
-        public static float deltaTime;
+        private float _explorationFactor = .5f;
+        private const int _nbSearch = 200;
+        public const int nbSimulation = 30;
+        public const float deltaTime = 1 / 10f;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
@@ -34,6 +34,9 @@ namespace MCTS
             {
                 MCTSNode explored = Select();
                 MCTSNode expanded = explored.Expand(explored == _root ? isP1 : null);
+                _allNodes.Add(expanded);
+                if (explored.Expanded)
+                    _allNodes.Remove(explored);
                 explored.Simulate(isP1);
                 expanded.BackPropagation();
             }
@@ -45,8 +48,8 @@ namespace MCTS
         }
         public MCTSNode Select()
         {
-            _allNodes = new List<MCTSNode>();
-            ExploreTree(_root, _allNodes);
+            /*_allNodes = new List<MCTSNode>();
+            ExploreTree(_root, _allNodes);*/
             if (UnityEngine.Random.Range(0, 1f) < _explorationFactor)
             {
                 return RandomNode();
