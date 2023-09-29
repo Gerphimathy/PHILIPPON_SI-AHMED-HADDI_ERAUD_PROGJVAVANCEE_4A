@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b779b3b7368a05444b8550e4eb8c7dba, type: 3}
   m_Name: MCTS Settings
   m_EditorClassIdentifier: 
-  _explorationFactor: 0.8
-  _nbSearch: 200
+  explorationFactor: 0.5
+  nbSearch: 400
+  nbSimulation: 20
+  deltaTime: 0.1

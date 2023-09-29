@@ -19,10 +19,10 @@ namespace MCTS
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
-        private static float _explorationFactor = .5f;
-        private static int _nbSearch = 200;
-        public static int nbSimulation = 30;
-        public static float deltaTime = 1 / 10f;
+        private static float _explorationFactor;
+        private static int _nbSearch;
+        public static int nbSimulation;
+        public static float deltaTime;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
@@ -95,7 +95,7 @@ namespace MCTS
             return BestMove();
         }
 
-        public void SetSettings(MCTSSettings mctsSettings)
+        public static void SetSettings(MCTSSettings mctsSettings)
         {
             _explorationFactor = mctsSettings.explorationFactor;
             _nbSearch = mctsSettings.nbSearch;

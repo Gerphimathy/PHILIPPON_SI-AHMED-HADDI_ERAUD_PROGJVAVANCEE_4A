@@ -75,6 +75,7 @@ public class GameManager : MonoBehaviour
         _player1Score = 0;
         _player2Score = 0;
         BuildWalls();
+        MCTSPlayer.SetSettings(mctsSettings);
     }
     private void SetPlayers()
     {
@@ -83,14 +84,8 @@ public class GameManager : MonoBehaviour
             Player2 = NewPlayer(_p2Type, false);
         else
             Player2 = new Player(false);
-        
         Assert.IsTrue(Player1 != null);
         Assert.IsTrue(Player2 != null);
-        
-        if(Player1 is MCTSPlayer mctsPlayer)
-            mctsPlayer.SetSettings(mctsSettings);
-        if(Player2 is MCTSPlayer mctsPlayer2)
-            mctsPlayer2.SetSettings(mctsSettings);
     }
     private APlayer NewPlayer(PlayerType t,bool isP1)
     {
