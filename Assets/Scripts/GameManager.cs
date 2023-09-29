@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     }
     private GameState _gameState;
 
+    public GameState GameState => _gameState;
+
     public PlayerType p1Type;
     public PlayerType p2Type;
     public APlayer Player1;
@@ -24,8 +26,12 @@ public class GameManager : MonoBehaviour
     public GameObject paddleGo2;
     public GameObject ballGo;
     
+    public float initialTimer = 60f;
+    
     [SerializeField] 
     public Bounds terrainBounds;
+    
+    public AudioSource pongSound;
     
     void Start()
     {
@@ -34,7 +40,7 @@ public class GameManager : MonoBehaviour
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
             new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
         SetPlayers();
-        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
+        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
         
         //Create cube object walls that match _terrainBounds
         GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -71,22 +77,16 @@ public class GameManager : MonoBehaviour
         return i;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawCube(_gameState.Ball.Moveable.Bounds.center,_gameState.Ball.Moveable.Bounds.size);
-        Gizmos.DrawCube(_gameState.Paddle1.Moveable.Bounds.center,_gameState.Paddle1.Moveable.Bounds.size);
-        Gizmos.DrawCube(_gameState.Paddle2.Moveable.Bounds.center,_gameState.Paddle2.Moveable.Bounds.size);
-        Gizmos.DrawCube(_gameState.TerrainBounds.center,_gameState.TerrainBounds.size);
-
-    }
-
     void Update()
     {
         //To-do find a way to update bot players game states
-
-        //
-        _gameState.Tick(Player1.GetAction(ref _gameState), Player2.GetAction(ref _gameState), Time.deltaTime);
+        
+        var dir = _gameState.Ball.Direction;
+        
+        _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
         SyncMovables();
+
+        if (_gameState.Ball.Direction != dir) pongSound.Play();
 
         if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
         {
