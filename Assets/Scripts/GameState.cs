@@ -69,16 +69,20 @@ public struct GameState
         if (a == Action.Up)
         {
             target.Move(Vector3.right * delta);
-            return (_terrainBounds.Contains(target.Bounds.min)
+            bool valid = (_terrainBounds.Contains(target.Bounds.min)
                &&
                _terrainBounds.Contains(target.Bounds.max));
+            target.Move(Vector3.left * delta);
+            return valid;
         }
         if (a == Action.Down)
         {
             target.Move(Vector3.left * delta);
-            return (_terrainBounds.Contains(target.Bounds.min)
+            bool valid = (_terrainBounds.Contains(target.Bounds.min)
                &&
                _terrainBounds.Contains(target.Bounds.max));
+            target.Move(Vector3.right * delta);
+            return valid;
         }
         throw new Exception("Unsupported action");
     }
@@ -120,7 +124,7 @@ public struct GameState
         _timer -= delta;
         if (_timer <= 0) _gameStatus = GameStatusEnum.Draw;
         
-        if (!_terrainBounds.Intersects(_ball.Moveable.Bounds) && _gameStatus == GameStatusEnum.Ongoing)
+        if (!_terrainBounds.Contains(_ball.Moveable.Bounds.center) && _gameStatus == GameStatusEnum.Ongoing)
         {
             var ballCenter = _ball.Moveable.Bounds.center;
             var closestPoint = _terrainBounds.ClosestPoint(ballCenter);

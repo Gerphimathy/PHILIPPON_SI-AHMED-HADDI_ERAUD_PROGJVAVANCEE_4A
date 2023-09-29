@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pong;
 using MCTS;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+using TMPro;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,32 +19,158 @@ public class GameManager : MonoBehaviour
 
     public GameState GameState => _gameState;
 
-    public PlayerType p1Type;
-    public PlayerType p2Type;
-    public APlayer Player1;
-    public APlayer Player2;
+    private int _player1Score;
+    private int _player2Score;
+    
+    private PlayerType _p1Type;
+    private PlayerType _p2Type;
+
+    public PlayerType P1Type
+    {
+        get => _p1Type;
+        set => _p1Type = value;
+    }
+
+    public PlayerType P2Type
+    {
+        get => _p2Type;
+        set => _p2Type = value;
+    }
+
+    private APlayer Player1;
+    private APlayer Player2;
 
     [Header("Reference")]
     public GameObject paddleGo1;
     public GameObject paddleGo2;
     public GameObject ballGo;
+    public TMP_Text scoreText;
+    
+    [Header("Initial Locations")]
+    public Vector3 paddle1InitialLocation;
+    public Vector3 paddle2InitialLocation;
+    public Vector3 ballInitialLocation;
     
     public float initialTimer = 60f;
     
     [SerializeField] 
     public Bounds terrainBounds;
+
+    private bool _isGameRunning;
     
     public AudioSource pongSound;
+
     
     void Start()
+    {
+        _isGameRunning = false;
+        _player1Score = 0;
+        _player2Score = 0;
+    }
+    private void SetPlayers()
+    {
+        Player1 = NewPlayer(_p1Type, true);
+        if (! (_p1Type == _p2Type && _p1Type == PlayerType.Human))
+            Player2 = NewPlayer(_p2Type, false);
+        else
+            Player2 = new Player(false);
+    }
+    private APlayer NewPlayer(PlayerType t,bool isP1)
+    {
+        APlayer i = t switch
+        {
+            PlayerType.Human => new Player(isP1),
+            PlayerType.Random => new RandomPlayer(isP1),
+            PlayerType.PseudoRandom => new PseudoRandomPlayer(isP1),
+            PlayerType.MonteCarlo => new MCTSPlayer(isP1),
+            _ => throw new ArgumentOutOfRangeException(nameof(t), t, null)
+        };
+        return i;
+    }
+
+
+
+    void ResetGameState(Vector3 direction)
     {
         var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
         var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.GetChild(0).localScale));
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
-            new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
-        SetPlayers();
+            direction,paddle1.Moveable,paddle2.Moveable);
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
+
+    }
+    
+    public void InitializeGame()
+    {
+        ResetGameState(new Vector3(-1f,0,-1f));
+        SetPlayers();
+        BuildWalls();
+        _isGameRunning = true;
+        _player1Score = 0;
+        _player2Score = 0;
+        UpdateScore();
+    }
+    
+    void ResetGame()
+    {
+        paddleGo1.transform.position = paddle1InitialLocation;
+        paddleGo2.transform.position = paddle2InitialLocation;
+        ballGo.transform.position = ballInitialLocation;
         
+        TrailRenderer trail = ballGo.GetComponent<TrailRenderer>();
+        trail.Clear();
+        
+
+        
+        Vector3 direction = _gameState.Ball.Direction;
+        direction*= -1;
+        
+        ResetGameState(direction);
+        
+        _isGameRunning = true;
+    }
+
+    void Update()
+    {
+        //To-do find a way to update bot players game states
+        if (_isGameRunning)
+        {
+            var dir = _gameState.Ball.Direction;
+            _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
+            SyncMovables();
+            
+            if (_gameState.Ball.Direction != dir) pongSound.Play();
+
+            if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
+            {
+                _isGameRunning = false;
+                if(_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
+                    _player1Score++;
+                else if(_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                    _player2Score++;
+                else
+                    Assert.IsTrue(_gameState.GameStatus == GameState.GameStatusEnum.Draw);
+                
+                UpdateScore();
+                ResetGame();
+            }
+        }
+    }
+    
+    void SyncMovables()
+    {
+        paddleGo1.transform.position = _gameState.Paddle1.Moveable.Bounds.center;
+        paddleGo2.transform.position = _gameState.Paddle2.Moveable.Bounds.center;
+        ballGo.transform.position = _gameState.Ball.Moveable.Bounds.center;
+    }
+
+    void UpdateScore()
+    {
+        scoreText.text = _player1Score + " - " + _player2Score;
+    }
+
+    private void BuildWalls()
+    {
         //Create cube object walls that match _terrainBounds
         GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
         wall.transform.position = new Vector3(terrainBounds.center.x,terrainBounds.center.y,terrainBounds.min.z);
@@ -59,46 +188,5 @@ public class GameManager : MonoBehaviour
         wall4.transform.position = new Vector3(terrainBounds.max.x,terrainBounds.center.y,terrainBounds.center.z);
         wall4.transform.localScale = new Vector3(0.1f,2,terrainBounds.size.z);
     }
-    private void SetPlayers()
-    {
-        Player1 = NewPlayer(p1Type,true);
-        Player2 = NewPlayer(p2Type,false);
-    }
-    private APlayer NewPlayer(PlayerType t,bool isP1)
-    {
-        APlayer i = t switch
-        {
-            PlayerType.Human => new Player(isP1),
-            PlayerType.Random => new RandomPlayer(isP1),
-            PlayerType.PseudoRandom => new PseudoRandomPlayer(isP1),
-            PlayerType.MonteCarlo => new MCTSPlayer(isP1),
-            _ => throw new ArgumentOutOfRangeException(nameof(t), t, null)
-        };
-        return i;
-    }
-
-    void Update()
-    {
-        //To-do find a way to update bot players game states
-        
-        var dir = _gameState.Ball.Direction;
-        
-        _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
-        SyncMovables();
-
-        if (_gameState.Ball.Direction != dir) pongSound.Play();
-
-        if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
-        {
-            Destroy(ballGo.gameObject);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-    }
     
-    void SyncMovables()
-    {
-        paddleGo1.transform.position = _gameState.Paddle1.Moveable.Bounds.center;
-        paddleGo2.transform.position = _gameState.Paddle2.Moveable.Bounds.center;
-        ballGo.transform.position = _gameState.Ball.Moveable.Bounds.center;
-    }
 }
