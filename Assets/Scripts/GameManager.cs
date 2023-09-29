@@ -91,16 +91,12 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         //To-do find a way to update bot players game states
-
-        //
         if (_isGameRunning)
         {
             var dir = _gameState.Ball.Direction;
             _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
             SyncMovables();
             
-            _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
-            SyncMovables();
             if (_gameState.Ball.Direction != dir) pongSound.Play();
 
             if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
