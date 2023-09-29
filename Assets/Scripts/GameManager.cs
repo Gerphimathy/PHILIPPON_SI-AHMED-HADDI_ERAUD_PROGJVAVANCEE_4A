@@ -145,10 +145,9 @@ public class GameManager : MonoBehaviour
             {
                 _isGameRunning = false;
             }
-        }else if(Input.GetKeyDown(KeyCode.Return))
-        {
-            ResetGame();
         }
+        else if(Input.GetKeyDown(KeyCode.Return)) ResetGame();
+        else if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene(0);
     }
     
     void SyncMovables()
