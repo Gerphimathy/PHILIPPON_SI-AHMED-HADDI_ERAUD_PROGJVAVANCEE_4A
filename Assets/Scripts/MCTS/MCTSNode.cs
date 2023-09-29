@@ -20,7 +20,8 @@ namespace MCTS
         private float _total;
         private RandomPlayer p1 = new RandomPlayer(true);
         private RandomPlayer p2 = new RandomPlayer(false);
-        public float Score => _wins / _total;
+        //When we'll firstly try to get the score of the root for selecting bestNode on very first iteration we'll have a total score = to zero
+        public float Score => _total!=0 ? _wins / _total : float.MinValue+1;
 
 
         public MCTSNode(GameState gameState)
@@ -41,8 +42,20 @@ namespace MCTS
 
         public MCTSNode Expand(bool? forcePlayer)
         {
-            bool player=_depth%2==0;
-            var actions = GetPossibleActions(player).Except(_childrens.Select(c => c._parentAction)).ToList();
+            bool player=forcePlayer ?? _depth%2==0;
+            var actions = GetPossibleActions(player).ToList();
+            for (int i = 0; i < actions.Count; i++)
+            {
+                foreach(var c in _childrens)
+                {
+                    if (c._parentAction == actions[i])
+                    {
+                        actions.RemoveAt(i);
+                        i--;
+                        break;
+                    }
+                }
+            }
             //Debug.Log("Exanding from" + this.Expanded + "," + string.Join(',', this.Childrens.Select(s=>s._parentAction.ToString()))+";;;;"+ string.Join(',', GetPossibleActions(player))+",," +this._parentAction+" with available actions "+actions.Count);
             Assert.IsTrue(actions != null && actions.Count != 0);
             var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
@@ -67,10 +80,12 @@ namespace MCTS
                     if (isP1 ^ _gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
                     {
                         // We won
+                        //Debug.Log("Adding " + _gameState.Timer);
                         _wins += _gameState.Timer;
                     }
                     else
                     {
+                        //Debug.Log("Removing " + _gameState.Timer);
                         //We lost
                         _wins -= _gameState.Timer;
                     }
