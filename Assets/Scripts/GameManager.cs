@@ -39,6 +39,11 @@ public class GameManager : MonoBehaviour
     public GameObject paddleGo2;
     public GameObject ballGo;
     
+    [Header("Initial Locations")]
+    public Vector3 paddle1InitialLocation;
+    public Vector3 paddle2InitialLocation;
+    public Vector3 ballInitialLocation;
+    
     public float initialTimer = 60f;
     
     [SerializeField] 
@@ -75,16 +80,37 @@ public class GameManager : MonoBehaviour
 
 
 
-    public void InitializeGame()
+    void ResetGameState(Vector3 direction)
     {
         var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
         var paddle2 = new Paddle( new Moveable(4f, paddleGo2.transform.position,paddleGo2.transform.GetChild(0).localScale));
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
-            new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
-        SetPlayers();
+            direction,paddle1.Moveable,paddle2.Moveable);
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
-        
+    }
+    
+    public void InitializeGame()
+    {
+        ResetGameState(new Vector3(-1f,0,-1f));
+        SetPlayers();
         BuildWalls();
+        _isGameRunning = true;
+    }
+    
+    void ResetGame()
+    {
+        paddleGo1.transform.position = paddle1InitialLocation;
+        paddleGo2.transform.position = paddle2InitialLocation;
+        ballGo.transform.position = ballInitialLocation;
+        
+        Vector3 direction = _gameState.Ball.Direction;
+        direction*= -1;
+        
+        TrailRenderer trail = ballGo.GetComponent<TrailRenderer>();
+        trail.Clear();
+        
+        ResetGameState(direction);
+        
         _isGameRunning = true;
     }
 
@@ -103,8 +129,10 @@ public class GameManager : MonoBehaviour
             {
                 _isGameRunning = false;
             }
+        }else if(Input.GetKeyDown(KeyCode.Return))
+        {
+            ResetGame();
         }
-
     }
     
     void SyncMovables()
