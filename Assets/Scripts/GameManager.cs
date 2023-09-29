@@ -27,6 +27,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] 
     public Bounds terrainBounds;
     
+    public AudioSource pongSound;
+    
     void Start()
     {
         var paddle1 = new Paddle( new Moveable(4f, paddleGo1.transform.position,paddleGo1.transform.GetChild(0).localScale));
@@ -74,22 +76,16 @@ public class GameManager : MonoBehaviour
         return i;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawCube(_gameState.Ball.Moveable.Bounds.center,_gameState.Ball.Moveable.Bounds.size);
-        Gizmos.DrawCube(_gameState.Paddle1.Moveable.Bounds.center,_gameState.Paddle1.Moveable.Bounds.size);
-        Gizmos.DrawCube(_gameState.Paddle2.Moveable.Bounds.center,_gameState.Paddle2.Moveable.Bounds.size);
-        Gizmos.DrawCube(_gameState.TerrainBounds.center,_gameState.TerrainBounds.size);
-
-    }
-
     void Update()
     {
         //To-do find a way to update bot players game states
-
-        //
+        
+        var dir = _gameState.Ball.Direction;
+        
         _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
         SyncMovables();
+
+        if (_gameState.Ball.Direction != dir) pongSound.Play();
 
         if (_gameState.GameStatus != GameState.GameStatusEnum.Ongoing)
         {

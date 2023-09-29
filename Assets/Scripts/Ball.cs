@@ -16,9 +16,6 @@ public struct Ball
     
     private readonly Moveable _paddle2Moveable;
     public Moveable Paddle2Moveable => _paddle2Moveable;
-    
-    
-
 
     public Ball(Moveable moveable, Vector3 direction, Moveable paddle1Moveable, Moveable paddle2Moveable)
     {
