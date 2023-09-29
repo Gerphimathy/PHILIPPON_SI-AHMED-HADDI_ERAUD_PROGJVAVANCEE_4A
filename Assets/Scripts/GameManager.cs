@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
     }
     private GameState _gameState;
 
+    public GameState GameState => _gameState;
+
     private PlayerType _p1Type;
     private PlayerType _p2Type;
 
@@ -29,8 +31,8 @@ public class GameManager : MonoBehaviour
         set => _p2Type = value;
     }
 
-    private IPlayer Player1;
-    private IPlayer Player2;
+    private APlayer Player1;
+    private APlayer Player2;
 
     [Header("Reference")]
     public GameObject paddleGo1;
@@ -52,11 +54,11 @@ public class GameManager : MonoBehaviour
     }
     private void SetPlayers()
     {
-        Player1 = NewPlayer(_p1Type);
+        Player1 = NewPlayer(_p1Type, true);
         if (! (_p1Type == _p2Type && _p1Type == PlayerType.Human))
-            Player2 = NewPlayer(_p2Type);
+            Player2 = NewPlayer(_p2Type, false);
         else
-            Player2 = new Player(Player.Scheme.ZQSD);
+            Player2 = new Player(false);
     }
     private APlayer NewPlayer(PlayerType t,bool isP1)
     {
@@ -80,7 +82,7 @@ public class GameManager : MonoBehaviour
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
             new Vector3(-1f,0,-1f),paddle1.Moveable,paddle2.Moveable);
         SetPlayers();
-        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds);
+        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
         
         BuildWalls();
         _isGameRunning = true;
@@ -94,7 +96,7 @@ public class GameManager : MonoBehaviour
         if (_isGameRunning)
         {
             var dir = _gameState.Ball.Direction;
-            _gameState.Tick(Player1.GetAction(), Player2.GetAction(), Time.deltaTime);
+            _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
             SyncMovables();
             
             _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
