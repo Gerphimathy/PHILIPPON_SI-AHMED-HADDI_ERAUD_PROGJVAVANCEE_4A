@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pong;
 using MCTS;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -16,6 +17,9 @@ public class GameManager : MonoBehaviour
 
     public GameState GameState => _gameState;
 
+    private float _player1Score = 0;
+    private float _player2Score = 0;
+    
     private PlayerType _p1Type;
     private PlayerType _p2Type;
 
@@ -103,11 +107,23 @@ public class GameManager : MonoBehaviour
         paddleGo2.transform.position = paddle2InitialLocation;
         ballGo.transform.position = ballInitialLocation;
         
-        Vector3 direction = _gameState.Ball.Direction;
-        direction*= -1;
-        
         TrailRenderer trail = ballGo.GetComponent<TrailRenderer>();
         trail.Clear();
+        
+        if(_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
+            _player1Score++;
+        else if(_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+            _player2Score++;
+        else if(_gameState.GameStatus == GameState.GameStatusEnum.Draw)
+        {
+            _player1Score += .5f;
+            _player2Score += .5f;
+        }
+        else 
+            Assert.IsTrue(false);
+        
+        Vector3 direction = _gameState.Ball.Direction;
+        direction*= -1;
         
         ResetGameState(direction);
         
