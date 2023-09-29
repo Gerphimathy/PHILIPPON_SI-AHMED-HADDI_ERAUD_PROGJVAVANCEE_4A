@@ -19,10 +19,10 @@ namespace MCTS
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
-        private float _explorationFactor = .5f;
-        private const int _nbSearch = 200;
-        public const int nbSimulation = 30;
-        public const float deltaTime = 1 / 10f;
+        private static float _explorationFactor = .5f;
+        private static int _nbSearch = 200;
+        public static int nbSimulation = 30;
+        public static float deltaTime = 1 / 10f;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
