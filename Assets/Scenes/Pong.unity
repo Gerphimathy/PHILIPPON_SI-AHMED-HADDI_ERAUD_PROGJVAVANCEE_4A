@@ -6308,11 +6308,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8386489454233151145, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8386489454233151145, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8386489454233151145, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
       propertyPath: m_LocalScale.z
@@ -14569,11 +14569,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8386489454233151145, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8386489454233151145, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8386489454233151145, guid: dd4f6d480a224714a940bc1bc4a325aa, type: 3}
       propertyPath: m_LocalScale.z
@@ -15129,6 +15129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4f1d65053c3ee3449a1b0eb7b10f8ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mctsSettings: {fileID: 11400000, guid: 44005c327acf76640ab9016b7104af4e, type: 2}
   paddleGo1: {fileID: 259642702}
   paddleGo2: {fileID: 104315988}
   ballGo: {fileID: 682818956}
