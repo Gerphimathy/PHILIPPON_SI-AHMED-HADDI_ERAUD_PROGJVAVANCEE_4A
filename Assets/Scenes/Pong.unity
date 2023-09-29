@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4366757, g: 0.48427194, b: 0.5645252, a: 1}
+  m_IndirectSpecularColor: {r: 0.43667564, g: 0.48427135, b: 0.5645233, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -6508,12 +6508,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5645c3e7f1de61419c1fb869ab2bc0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioMixer: {fileID: 24100000, guid: 60da31f7feebe2342af737a0c3ba303d, type: 2}
-  resolutionDropdown: {fileID: 719219359}
-  qualityDropdown: {fileID: 459518533}
-  textureDropdown: {fileID: 31374601}
-  aaDropdown: {fileID: 1163617674}
-  volumeSlider: {fileID: 188337304}
+  audioMixer: {fileID: 0}
+  resolutionDropdown: {fileID: 0}
+  qualityDropdown: {fileID: 0}
+  textureDropdown: {fileID: 0}
+  aaDropdown: {fileID: 0}
+  volumeSlider: {fileID: 0}
 --- !u!1 &1230270012
 GameObject:
   m_ObjectHideFlags: 0

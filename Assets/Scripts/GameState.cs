@@ -68,16 +68,20 @@ public struct GameState
         if (a == Action.Up)
         {
             target.Move(Vector3.right * delta);
-            return (_terrainBounds.Contains(target.Bounds.min)
+            bool valid = (_terrainBounds.Contains(target.Bounds.min)
                &&
                _terrainBounds.Contains(target.Bounds.max));
+            target.Move(Vector3.left * delta);
+            return valid;
         }
         if (a == Action.Down)
         {
             target.Move(Vector3.left * delta);
-            return (_terrainBounds.Contains(target.Bounds.min)
+            bool valid = (_terrainBounds.Contains(target.Bounds.min)
                &&
                _terrainBounds.Contains(target.Bounds.max));
+            target.Move(Vector3.right * delta);
+            return valid;
         }
         throw new Exception("Unsupported action");
     }
