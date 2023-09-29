@@ -14,7 +14,7 @@ public class PseudoRandomPlayer : APlayer
     {
 
     }
-    public override Action GetAction(ref GameState gameState)
+    public override Action GetAction(GameState gameState)
     {
         _remainingTime -= Time.deltaTime;
         if (_remainingTime <= 0)

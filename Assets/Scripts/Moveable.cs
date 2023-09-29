@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Moveable
+public struct Moveable
 {
     private float _speed;
     private Bounds _bounds;
 
-    public Moveable() : this(1f,Vector3.zero,Vector3.one)
+    public Moveable(float speed=1f) : this(speed,Vector3.zero,Vector3.one)
     {
     }
 

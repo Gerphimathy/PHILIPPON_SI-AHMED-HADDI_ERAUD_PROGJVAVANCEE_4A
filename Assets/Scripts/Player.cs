@@ -36,7 +36,7 @@ public class Player : APlayer
         }
     }
     
-    public override Action GetAction(ref GameState gameState)
+    public override Action GetAction(GameState gameState)
     {
         if (Input.GetKey(_up))
             return Action.Up;

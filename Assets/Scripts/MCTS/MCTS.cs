@@ -15,7 +15,8 @@ namespace MCTS
         }
         private void Init(GameState gameState)
         {
-            _root = new(gameState);
+            var copy = new GameState(gameState);
+            _root = new(copy);
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
@@ -98,7 +99,7 @@ namespace MCTS
             }
         }
 
-        public override Action GetAction(ref GameState gameState)
+        public override Action GetAction(GameState gameState)
         {
             Init(gameState);
             return BestMove();

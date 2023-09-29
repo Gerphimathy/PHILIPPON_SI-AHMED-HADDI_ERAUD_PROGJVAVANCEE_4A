@@ -161,7 +161,7 @@ public class GameManager : MonoBehaviour
             }
             
             var dir = _gameState.Ball.Direction;
-            _gameState.Tick(Player1.GetAction(ref this._gameState), Player2.GetAction(ref this._gameState), Time.deltaTime);
+            _gameState.Tick(Player1.GetAction(this._gameState), Player2.GetAction(this._gameState), Time.deltaTime);
             SyncMovables();
             
             if (_gameState.Ball.Direction != dir) pongSound.Play();

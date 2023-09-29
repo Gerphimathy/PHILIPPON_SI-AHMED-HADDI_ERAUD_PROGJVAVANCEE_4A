@@ -42,6 +42,12 @@ public struct GameState
         _timer = InitialTimer;
     }
 
+    public GameState(GameState gameState) : this(gameState._paddle1,gameState._paddle2,gameState._ball,gameState.TerrainBounds,gameState.InitialTimer)
+    {
+        //We keep initial timer only we don't intialize by copy
+        this._timer = gameState.Timer;
+    }
+
     public Paddle Paddle1 => _paddle1;
 
     public Paddle Paddle2 => _paddle2;

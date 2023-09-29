@@ -9,5 +9,5 @@ public abstract class APlayer
         this.isP1 = isP1;
     }
 
-    public abstract Action GetAction(ref GameState gameState);
+    public abstract Action GetAction(GameState gameState);
 }

@@ -27,15 +27,15 @@ namespace MCTS
 
         public MCTSNode(GameState gameState)
         {
-            _gameState = gameState;
+            _gameState = new GameState(gameState);
         }
         public MCTSNode(MCTSNode parent, Action parentAction,bool isP1) : this(parent.GameState)
         {
             this._parent = parent;
             this._parentAction = parentAction;
-            this._gameState.Tick(isP1 ? parentAction : Action.None, !isP1 ? parentAction : Action.None, MCTS.MCTSPlayer.deltaTime);
             parent._childrens.Add(this);
             this._depth = parent._depth + 1;
+            this._gameState.Tick(isP1 ? parentAction : Action.None, !isP1 ? parentAction : Action.None, MCTSPlayer.deltaTime);
         }
         public IEnumerable<Action> GetPossibleActions(bool isP1)
         {
@@ -75,8 +75,8 @@ namespace MCTS
                 var currentSim = this._gameState;
                 while (currentSim.GameStatus == GameState.GameStatusEnum.Ongoing)
                 {
-                    var a1 = p1.GetValidAction(ref currentSim, true, MCTSPlayer.deltaTime);
-                    var a2 = p2.GetValidAction(ref currentSim, false, MCTSPlayer.deltaTime);
+                    var a1 = p1.GetValidAction(currentSim, true, MCTSPlayer.deltaTime);
+                    var a2 = p2.GetValidAction(currentSim, false, MCTSPlayer.deltaTime);
                     currentSim.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
                 //Debug.Log(_total + " total");
