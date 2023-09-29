@@ -56,10 +56,10 @@ public class GameManager : MonoBehaviour
     private void SetPlayers()
     {
         Player1 = NewPlayer(p1Type,true);
-        if (p1Type == p2Type && p1Type == PlayerType.Human)
-            Player2 = new Player(Player.Scheme.ZQSD);
-        else
+        if (!(p1Type == p2Type && p1Type == PlayerType.Human))
             Player2 = NewPlayer(p2Type,false);
+        else
+            Player2 = new Player(Player.Scheme.ZQSD,false);
     }
     private IPlayer NewPlayer(PlayerType t,bool isP1)
     {
@@ -69,6 +69,7 @@ public class GameManager : MonoBehaviour
             PlayerType.Random => new RandomPlayer(),
             PlayerType.PseudoRandom => new PseudoRandomPlayer(),
             PlayerType.MonteCarlo => new MCTSPlayer(_gameState,isP1),
+            _ => throw new ArgumentOutOfRangeException(nameof(t), t, null)
         };
         return i;
     }
