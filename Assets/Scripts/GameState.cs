@@ -49,16 +49,18 @@ public struct GameState
     public Ball Ball => _ball;
 
     public Bounds TerrainBounds => _terrainBounds;
-    public IEnumerable<Action> GetPossibleActions(bool player, float? delta = null)
+    public List<Action> GetPossibleActions(bool player, float? delta = null)
     {
+        var l = new List<Action>();
         if (!delta.HasValue)
             delta = Time.deltaTime;
         var actions = (Action[])Enum.GetValues(typeof(Action));
         for (int i = 0; i < actions.Length; i++)
         {
             if (isActionValid(actions[i], player, delta.Value))
-                yield return actions[i];
+                l.Add(actions[i]);
         }
+        return l;
     }
     public bool isActionValid(Action a, bool player, float delta)
     {

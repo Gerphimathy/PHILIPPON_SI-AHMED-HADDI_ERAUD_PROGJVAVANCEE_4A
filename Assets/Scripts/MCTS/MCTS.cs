@@ -33,7 +33,7 @@ namespace MCTS
             for (int it = 0; it < _nbSearch; it++)
             {
                 MCTSNode explored = Select();
-                MCTSNode expanded = explored.Expand();
+                MCTSNode expanded = explored.Expand(explored==_root ? isP1 : null);
                 explored.Simulate(isP1);
                 expanded.BackPropagation();
             }

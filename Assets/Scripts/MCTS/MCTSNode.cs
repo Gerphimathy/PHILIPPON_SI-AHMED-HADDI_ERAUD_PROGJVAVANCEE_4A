@@ -36,9 +36,9 @@ namespace MCTS
             return _gameState.GetPossibleActions(isP1, MCTSPlayer.deltaTime).ToList();
         }
 
-        public MCTSNode Expand()
+        public MCTSNode Expand(bool? forcePlayer)
         {
-            var actions = GetPossibleActions(UnityEngine.Random.Range(0, 2) == 0).Except(_childrens.Select(c => c._parentAction)).ToList();
+            var actions = GetPossibleActions(forcePlayer ?? UnityEngine.Random.Range(0, 2) == 0).Except(_childrens.Select(c => c._parentAction)).ToList();
             Assert.IsTrue(actions != null && actions.Count != 0);
             var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
             if (actions.Count == 1)
