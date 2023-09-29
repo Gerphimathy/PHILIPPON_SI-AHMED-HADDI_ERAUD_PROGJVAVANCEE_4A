@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
     }
 
     private APlayer Player1;
-    private APlayer Player2;
+    private APlayer Player2=new MCTSPlayer(false);
 
     [Header("Reference")]
     public GameObject paddleGo1;

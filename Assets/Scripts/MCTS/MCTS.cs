@@ -24,7 +24,6 @@ namespace MCTS
         public static int nbSimulation = 30;
         public static float deltaTime = 1 / 10f;
 
-        private GameState gameState => _root.GameState;
         private MCTSNode _root;
         private List<MCTSNode> _allNodes;
 

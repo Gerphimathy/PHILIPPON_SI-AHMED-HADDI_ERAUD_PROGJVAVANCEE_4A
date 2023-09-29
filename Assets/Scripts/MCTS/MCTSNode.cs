@@ -21,7 +21,7 @@ namespace MCTS
         private RandomPlayer p1 = new RandomPlayer(true);
         private RandomPlayer p2 = new RandomPlayer(false);
         //When we'll firstly try to get the score of the root for selecting bestNode on very first iteration we'll have a total score = to zero
-        public float Score => _total!=0 ? _wins / _total : float.MinValue+1;
+        public float Score => _total != 0 ? _wins / _total : float.MinValue + 1;
 
 
         public MCTSNode(GameState gameState)
@@ -42,11 +42,11 @@ namespace MCTS
 
         public MCTSNode Expand(bool? forcePlayer)
         {
-            bool player=forcePlayer ?? _depth%2==0;
+            bool player = forcePlayer ?? _depth % 2 == 0;
             var actions = GetPossibleActions(player).ToList();
             for (int i = 0; i < actions.Count; i++)
             {
-                foreach(var c in _childrens)
+                foreach (var c in _childrens)
                 {
                     if (c._parentAction == actions[i])
                     {
@@ -77,20 +77,34 @@ namespace MCTS
                 _total += _gameState.InitialTimer;
                 if (_gameState.GameStatus != GameState.GameStatusEnum.Draw)
                 {
-                    if (isP1 ^ _gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                    if (isP1)
                     {
-                        // We won
-                        //Debug.Log("Adding " + _gameState.Timer);
-                        _wins += _gameState.Timer;
+                        if (_gameState.GameStatus == GameState.GameStatusEnum.Player1Win)
+                            Win();
+                        else
+                            Lose();
                     }
                     else
                     {
-                        //Debug.Log("Removing " + _gameState.Timer);
-                        //We lost
-                        _wins -= _gameState.Timer;
+                        if (_gameState.GameStatus == GameState.GameStatusEnum.Player2Win)
+                            Win();
+                        else
+                            Lose();
                     }
                 }
             }
+        }
+        void Lose()
+        {
+            //Debug.Log("Removing " + _gameState.Timer);
+            //We lost
+            _wins -= _gameState.Timer / 100f;
+        }
+        void Win()
+        {
+            // We won
+            //Debug.Log("Adding " + _gameState.Timer);
+            _wins += _gameState.Timer;
         }
 
         internal void BackPropagation()
