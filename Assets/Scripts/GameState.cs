@@ -42,6 +42,22 @@ public struct GameState
         _timer = InitialTimer;
     }
 
+    public GameState(Paddle paddle1, Paddle paddle2, float ballSpeed, Vector3 ballInitialLocation, Vector3 ballBounds, Vector3 direction,
+        Bounds terrainBounds, float timer)
+    {
+        _paddle1 = paddle1;
+        _paddle2 = paddle2;
+        var paddle1Moveable = _paddle1.Moveable;
+        var paddle2Moveable = _paddle2.Moveable;
+        _ball = new Ball(new Moveable(ballSpeed, ballInitialLocation, ballBounds),
+            direction,ref paddle1Moveable,ref paddle2Moveable);
+        _terrainBounds = terrainBounds;
+        _gameStatus = GameStatusEnum.Ongoing;
+        InitialTimer = timer;
+        _timer = InitialTimer;
+        
+    }
+
     public GameState(GameState gameState) : this(gameState._paddle1,gameState._paddle2,gameState._ball,gameState.TerrainBounds,gameState.InitialTimer)
     {
         //We keep initial timer only we don't intialize by copy

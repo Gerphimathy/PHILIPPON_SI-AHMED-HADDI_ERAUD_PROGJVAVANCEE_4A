@@ -109,11 +109,15 @@ public class GameManager : MonoBehaviour
 
     void ResetGameState(Vector3 direction)
     {
-        var paddle1 = new Paddle( new Moveable(8f, paddle1InitialLocation,paddleGo1.transform.GetChild(0).localScale));
-        var paddle2 = new Paddle( new Moveable(8f, paddle2InitialLocation,paddleGo2.transform.GetChild(0).localScale));
-        var ball = new Ball(new Moveable(10f, ballInitialLocation, ballGo.transform.lossyScale),
-            direction,paddle1.Moveable,paddle2.Moveable);
-        _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
+        _gameState = new GameState(
+            new Paddle( new Moveable(8f, paddle1InitialLocation,paddleGo1.transform.GetChild(0).localScale)), 
+            new Paddle( new Moveable(8f, paddle2InitialLocation,paddleGo2.transform.GetChild(0).localScale)),
+            10f,
+            ballInitialLocation,
+            ballGo.transform.lossyScale,
+            direction,
+            terrainBounds, 
+            initialTimer);
     }
     
     public void InitializeGame()

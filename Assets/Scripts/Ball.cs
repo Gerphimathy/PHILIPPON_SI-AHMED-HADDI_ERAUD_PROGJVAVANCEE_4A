@@ -16,17 +16,17 @@ public struct Ball
     
     private readonly Moveable _paddle2Moveable;
     public Moveable Paddle2Moveable => _paddle2Moveable;
-
-    public Ball(Moveable moveable, Vector3 direction, Moveable paddle1Moveable, Moveable paddle2Moveable)
+    
+    public Ball(Moveable moveable, Vector3 direction, ref Moveable paddle1Moveable, ref Moveable paddle2Moveable)
     {
         _moveable = moveable;
         Direction = direction;
-        this._paddle1Moveable = paddle1Moveable;
-        this._paddle2Moveable = paddle2Moveable;
+        _paddle1Moveable = paddle1Moveable;
+        _paddle2Moveable = paddle2Moveable;
     }
 
     public void Move(ref Bounds terrainBounds, float delta)
     {
-        Moveable.Move(Direction.normalized * delta);
+        _moveable.Move(Direction.normalized * delta);
     }
 }
