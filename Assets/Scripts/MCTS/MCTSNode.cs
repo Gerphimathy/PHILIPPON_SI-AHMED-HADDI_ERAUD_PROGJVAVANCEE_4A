@@ -20,6 +20,7 @@ namespace MCTS
         private float _total;
         private RandomPlayer p1 = new RandomPlayer(true);
         private RandomPlayer p2 = new RandomPlayer(false);
+        private List<Action> _availableActions;
         //When we'll firstly try to get the score of the root for selecting bestNode on very first iteration we'll have a total score = to zero
         public float Score => _total != 0 ? (_wins / _total) : float.MinValue + 1;
 
@@ -28,38 +29,40 @@ namespace MCTS
         {
             _gameState = gameState;
         }
-        public MCTSNode(MCTSNode parent, Action parentAction) : this(parent.GameState)
+        public MCTSNode(MCTSNode parent, Action parentAction,bool isP1) : this(parent.GameState)
         {
             this._parent = parent;
             this._parentAction = parentAction;
+            this._gameState.Tick(isP1 ? parentAction : Action.None, !isP1 ? parentAction : Action.None, MCTS.MCTSPlayer.deltaTime);
             parent._childrens.Add(this);
             this._depth = parent._depth + 1;
         }
         public IEnumerable<Action> GetPossibleActions(bool isP1)
         {
-            return _gameState.GetPossibleActions(isP1, MCTSPlayer.deltaTime).ToList();
+            return _gameState.GetPossibleActions(isP1, MCTSPlayer.deltaTime);
         }
 
         public MCTSNode Expand(bool? forcePlayer)
         {
             bool player = forcePlayer ?? _depth % 2 == 0;
-            var actions = GetPossibleActions(player).ToList();
-            for (int i = 0; i < actions.Count; i++)
+            //If never expanded i.e we never determined possible actions we do it now but we'll keep the list for the other steps, on a given game state, available actions won't change
+            _availableActions ??= GetPossibleActions(player).ToList();
+            for (int i = 0; i < _availableActions.Count; i++)
             {
                 foreach (var c in _childrens)
                 {
-                    if (c._parentAction == actions[i])
+                    if (c._parentAction == _availableActions[i])
                     {
-                        actions.RemoveAt(i);
+                        _availableActions.RemoveAt(i);
                         i--;
                         break;
                     }
                 }
             }
-            //Debug.Log("Exanding from" + this.Expanded + "," + string.Join(',', this.Childrens.Select(s=>s._parentAction.ToString()))+";;;;"+ string.Join(',', GetPossibleActions(player))+",," +this._parentAction+" with available actions "+actions.Count);
-            Assert.IsTrue(actions != null && actions.Count != 0);
-            var son = new MCTSNode(this, MCTSPlayer.RandomValue(actions));
-            if (actions.Count == 1)
+            //Debug.Log("Exanding from" + this.Expanded + "," + string.Join(',', this.Childrens.Select(s => s._parentAction.ToString())) + ";;;;" + string.Join(',', GetPossibleActions(player)) + ",," + this._parentAction + " with available actions " + _availableActions.Count);
+            Assert.IsTrue(_availableActions != null && _availableActions.Count != 0);
+            var son = new MCTSNode(this, MCTSPlayer.RandomValue(_availableActions),player);
+            if (_availableActions.Count <= 1 || (son.GameState.GameStatus != GameState.GameStatusEnum.Ongoing))
                 _expanded = true;
             return son;
         }
@@ -76,42 +79,42 @@ namespace MCTS
                     var a2 = p2.GetValidAction(ref currentSim, false, MCTSPlayer.deltaTime);
                     currentSim.Tick(a1, a2, MCTSPlayer.deltaTime);
                 }
-                Debug.Log(_total + " total");
+                //Debug.Log(_total + " total");
                 _total += currentSim.InitialTimer;
                 if (currentSim.GameStatus != GameState.GameStatusEnum.Draw)
                 {
-                    Debug.Log(currentSim.Timer+", "+this.Score+",,"+_wins+" : "+ currentSim.GameStatus);
+                    //Debug.Log(currentSim.Timer+", "+this.Score+",,"+_wins+" : "+ currentSim.GameStatus);
                     //Win();
                     if (isP1)
                     {
                         if (currentSim.GameStatus == GameState.GameStatusEnum.Player1Win)
-                            Lose(ref currentSim);
-                        else
                             Win(ref currentSim);
+                        else
+                            Lose(ref currentSim);
                     }
                     else
                     {
                         if (currentSim.GameStatus == GameState.GameStatusEnum.Player2Win)
-                            Lose(ref currentSim);
-                        else
                             Win(ref currentSim);
+                        else
+                            Lose(ref currentSim);
                     }
-                    Debug.Log(currentSim.Timer+", "+this.Score);
+                    //Debug.Log(currentSim.Timer+", "+this.Score);
                 }
             }
         }
-        void Win(ref GameState _gameState)
+        void Win(ref GameState sim)
         {
             // We won
-            Debug.Log("Won " + _gameState.Timer);
-            _wins += _gameState.Timer;
+            //Debug.Log("Won " + sim.Timer);
+            _wins += sim.Timer;
         }
-        void Lose(ref GameState _gameState)
+        void Lose(ref GameState sim)
         {
             //Debug.Log("Removing " + _gameState.Timer);
             //We lost
             _wins -= 0;
-            //_wins -=_gameState.Timer / 100f;
+            _wins -=sim.Timer;
         }
 
         internal void BackPropagation()
@@ -120,7 +123,7 @@ namespace MCTS
         }
         private void BackPropagation(float wins, float total)
         {
-            Debug.Log(this.Score+" current propagated score");
+            //Debug.Log(this.Score + " current propagated score");
             if (_parent == null)
                 return;
             _parent._wins += wins;
