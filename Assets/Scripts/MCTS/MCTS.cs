@@ -19,10 +19,10 @@ namespace MCTS
             _allNodes = new List<MCTSNode>();
             _allNodes.Add(_root);
         }
-        private float _explorationFactor = .5f;
-        private const int _nbSearch = 200;
-        public const int nbSimulation = 30;
-        public const float deltaTime = 1 / 10f;
+        private static float _explorationFactor;
+        private static int _nbSearch;
+        public static int nbSimulation;
+        public static float deltaTime;
 
         private GameState gameState => _root.GameState;
         private MCTSNode _root;
@@ -90,6 +90,14 @@ namespace MCTS
         {
             Init(gameState);
             return BestMove();
+        }
+
+        public void SetSettings(MCTSSettings mctsSettings)
+        {
+            _explorationFactor = mctsSettings.explorationFactor;
+            _nbSearch = mctsSettings.nbSearch;
+            nbSimulation = mctsSettings.nbSimulation;
+            deltaTime = mctsSettings.deltaTime;
         }
     }
 }

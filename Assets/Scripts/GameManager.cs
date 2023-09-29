@@ -11,6 +11,9 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    
+    [SerializeField] private MCTSSettings mctsSettings;
+    
     public enum PlayerType
     {
         Human,Random,PseudoRandom,MonteCarlo
@@ -74,6 +77,11 @@ public class GameManager : MonoBehaviour
             Player2 = NewPlayer(_p2Type, false);
         else
             Player2 = new Player(false);
+        
+        if(Player1 is MCTSPlayer mctsPlayer)
+            mctsPlayer.SetSettings(mctsSettings);
+        if(Player2 is MCTSPlayer mctsPlayer2)
+            mctsPlayer2.SetSettings(mctsSettings);
     }
     private APlayer NewPlayer(PlayerType t,bool isP1)
     {
@@ -97,7 +105,6 @@ public class GameManager : MonoBehaviour
         var ball = new Ball(new Moveable(4f, ballGo.transform.position, ballGo.transform.lossyScale),
             direction,paddle1.Moveable,paddle2.Moveable);
         _gameState = new GameState(paddle1, paddle2, ball, terrainBounds, initialTimer);
-
     }
     
     public void InitializeGame()
@@ -119,8 +126,6 @@ public class GameManager : MonoBehaviour
         
         TrailRenderer trail = ballGo.GetComponent<TrailRenderer>();
         trail.Clear();
-        
-
         
         Vector3 direction = _gameState.Ball.Direction;
         direction*= -1;
