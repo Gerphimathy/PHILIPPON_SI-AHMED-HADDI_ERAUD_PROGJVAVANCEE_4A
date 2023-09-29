@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Pong;
+using System.Linq;
 
 namespace MCTS
 {
@@ -32,24 +32,21 @@ namespace MCTS
         {
             for (int it = 0; it < _nbSearch; it++)
             {
-                MCTSNode explored = Select();
-                MCTSNode expanded = explored.Expand(explored == _root ? isP1 : null);
+                MCTSNode ex = Select();
+                MCTSNode expanded = ex.Expand(ex == _root ? isP1 : null);
                 _allNodes.Add(expanded);
-                if (explored.Expanded)
-                    _allNodes.Remove(explored);
-                explored.Simulate(isP1);
+                if (ex.Expanded)
+                    _allNodes.Remove(ex);
+                expanded.Simulate(isP1);
                 expanded.BackPropagation();
             }
             MCTSNode best = MaxValue(_root.Childrens);
-            Assert.IsNotNull(best);
+            Debug.LogWarning("Optimal is : "+ best + " : " + best.Score);
             return best.ParentAction;
-            Assert.IsTrue(false);
             return Action.None;
         }
         public MCTSNode Select()
         {
-            /*_allNodes = new List<MCTSNode>();
-            ExploreTree(_root, _allNodes);*/
             if (UnityEngine.Random.Range(0, 1f) < _explorationFactor)
             {
                 return RandomNode();
@@ -66,7 +63,20 @@ namespace MCTS
         }
         public static MCTSNode MaxValue(IList<MCTSNode> en)
         {
-            return en.OrderByDescending(n => n.Score).First();
+            if (en.Count == 1)
+                return en[0];
+            Assert.IsTrue(en.Any(e => !float.IsNaN(e.Score)));
+            var max = float.MinValue;
+            var maxInd = -1;
+            for (int i = 0; i < en.Count; i++)
+            {
+                if (en[i].Score > max)
+                {
+                    max = en[i].Score;
+                    maxInd = i;
+                }
+            }
+            return en[maxInd];
         }
         private MCTSNode RandomNode()
         {
